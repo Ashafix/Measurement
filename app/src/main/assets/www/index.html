@@ -1,0 +1,61 @@
+<head>
+  <script src="file:///android_asset/www/plotly-latest.min.js"></script>
+  <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+</head>
+
+<body>
+  <div id='dummy'></div>
+  <div id="plotlyDiv"></div>
+  <script>
+    fetch('http://10.0.2.2:8080/')
+	.then((resp) => resp.json())
+	.then(function(resp) {
+	  alert(resp);
+	  var div2 = document.getElementById('dummy');
+	  div2.innerHTML = resp;
+
+	  var div = document.getElementById('test');
+	  var data = {};
+	  //resp = [{'a': 0, 'b': 0, 'c': 0}];
+	  for (i in resp[0])
+	  {
+		  var div = document.createElement('div');
+		  div.id = 'plotly_' + i;
+		  document.body.appendChild(div);
+		  data[i] = {y: [],
+		   			mode: 'lines',
+					type: 'scatter'
+					};
+		  Plotly.newPlot(div, [data[i]] , [], {displayModeBar: false});
+	  }
+	})
+	.catch(err => {console.log(err)})
+	setInterval(function(){ 
+		
+		fetch('http://10.0.2.2:8080/')
+		.then((resp) => resp.json())
+		.then(function(resp){
+		var div = document.getElementById('test');
+		//resp = [{'a': 0, 'b': 0, 'c': 0}];
+		for (i in resp[0])
+		{
+			var val =  Math.random();
+			data[i].y.push(val);
+			Plotly.extendTraces('plotly_' + i, {y: [[val]]}, [0]);
+
+		}
+		//})
+		
+		
+	}, 1000);
+
+	
+
+	})
+	
+    
+
+
+
+  </script>
+</body>
