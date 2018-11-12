@@ -7,7 +7,7 @@
   <div id='dummy'></div>
   <div id="plotlyDiv"></div>
   <script>
-    fetch('http://10.0.2.2:8080/')
+    fetch('http://localhost:8080/')
 	.then((resp) => resp.json())
 	.then(function(resp) {
 	  alert(resp);
@@ -32,7 +32,7 @@
 	.catch(err => {console.log(err)})
 	setInterval(function(){ 
 		
-		fetch('http://10.0.2.2:8080/')
+		fetch('http://localhost:8080/')
 		.then((resp) => resp.json())
 		.then(function(resp){
 		var div = document.getElementById('test');
