@@ -4,45 +4,75 @@
 </head>
 
 <body>
-  <div id='dummy'>asdlfkj</div>
+  <div id="message">Initializing....</div>
   <div id="plotlyDiv"></div>
   <script>
-    var div2 = document.getElementById('dummy');
-    div2.innerHTML = 'started';
+    function init_data(resp, key)
+    {
+      var data = {y: [resp[key]],
+                  mode: 'lines',
+                  type: 'scatter',
+                 };
+      var div = document.getElementById('plotly_' + i);
+      if (div === null)
+      {
+        div = document.createElement('div');
+      
+      }
+      div.id = 'plotly_' + i;
+      document.body.appendChild(div);
+      Plotly.newPlot(div, [data],
+                     {'title': key}, {displayModeBar: false});
+      return data
+    }
+
+    function report_error(err)
+    {
+      console.log(err);
+      document.getElementById('message').innerHTML = err;
+    }
+    
+    function update_date()
+    {
+      var d = new Date();
+      document.getElementById('message').innerHTML = 'Last updated: ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
+    }
+    
+    var divMessage = document.getElementById('message');
+    divMessage.innerHTML = 'started';
     var data = {};
-    fetch('http://localhost:8080')
-    .then((resp) => resp.json())
-	.then(function(resp)
-	{
-	  var div = document.getElementById('test');
-	  for (i in resp)
-	  {
-		  var div = document.createElement('div');
-		  div.id = 'plotly_' + i;
-		  document.body.appendChild(div);
-		  data[i] = {y: [resp[i]],
-		   		  	 mode: 'lines',
-					 type: 'scatter'
-					};
-		  Plotly.newPlot(div, [data[i]] , [], {displayModeBar: false});
-	  }
-	})
-	.catch(err => {console.log(err)})
-
-	setInterval(function(){
-
-		fetch('http://localhost:8080/')
-		.then((resp) => resp.json())
-		.then(function(resp) {
-		  var div = document.getElementById('test');
-
-		  for (i in resp)
-		  {
-		    data[i].y.push(resp[i]);
-			Plotly.extendTraces('plotly_' + i, {y: [[resp[i]]]}, [0]);
-		  }
-		})
-	}, 1000);
+    
+    setInterval(function(){
+      fetch('http://localhost:8080/')
+      .then((resp) => resp.json())
+      .then(function(resp) {
+        var div = document.getElementById('test');
+        update_date();
+        for (i in resp)
+        {
+          if (i === 'timestamp')
+          {
+            continue;
+          }
+          if (data[i] !== undefined && data[i].y !== undefined)
+          {
+            data[i].y.push(resp[i]);
+            Plotly.extendTraces('plotly_' + i, {y: [[resp[i]]]}, [0]);
+          }
+          else
+          {
+            data[i] = init_data(resp, i)
+          }
+          if (data[i].y.length > 1000()
+          {
+            data[i] = {}
+          }
+          
+          
+        }
+      })
+      .catch(err => {report_error(err)})
+    }, 1000);
 
   </script>
 </body>
