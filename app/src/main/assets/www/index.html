@@ -1,78 +1,25 @@
 <head>
   <script src="file:///android_asset/www/plotly-latest.min.js"></script>
+  <script src="http://localhost:8080/www/plotly-latest.min.js"></script>
   <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
+  <script src="file://android_asset/www/measurement.js"></script>
+  <script src="http://localhost:8080/www/measurement.js"></script>
+
+  <link rel="stylesheet" href="file://android_asset/www/bootstrap.min.css">
+  <link rel="stylesheet" href="http://localhost:8080/www/bootstrap.min.css">
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+        integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
 </head>
 
 <body>
   <div id="message">Initializing....</div>
-  <div id="plotlyDiv"></div>
-  <script>
-    function init_data(resp, key)
-    {
-      var data = {y: [resp[key]],
-                  mode: 'lines',
-                  type: 'scatter',
-                 };
-      var div = document.getElementById('plotly_' + i);
-      if (div === null)
-      {
-        div = document.createElement('div');
-      
-      }
-      div.id = 'plotly_' + i;
-      document.body.appendChild(div);
-      Plotly.newPlot(div, [data],
-                     {'title': key}, {displayModeBar: false});
-      return data
-    }
+  <button type="button" class="btn btn-dark" id="button1" onclick="button(0)">Relay 1</button>
+  <button type="button" class="btn btn-dark" id="button2" onclick="button(1)">Relay 2</button>
+  <button type="button" class="btn btn-dark" id="button3" onclick="button(2)">Relay 3</button>
+  <button type="button" class="btn btn-dark" id="button4" onclick="button(3)">Relay 4</button>
 
-    function report_error(err)
-    {
-      console.log(err);
-      document.getElementById('message').innerHTML = err;
-    }
-    
-    function update_date()
-    {
-      var d = new Date();
-      document.getElementById('message').innerHTML = 'Last updated: ' + d.getHours() + ':' + d.getMinutes() + ':' + d.getSeconds();
-    }
-    
-    var divMessage = document.getElementById('message');
-    divMessage.innerHTML = 'started';
-    var data = {};
-    
-    setInterval(function(){
-      fetch('http://localhost:8080/')
-      .then((resp) => resp.json())
-      .then(function(resp) {
-        var div = document.getElementById('test');
-        update_date();
-        for (i in resp)
-        {
-          if (i === 'timestamp')
-          {
-            continue;
-          }
-          if (data[i] !== undefined && data[i].y !== undefined)
-          {
-            data[i].y.push(resp[i]);
-            Plotly.extendTraces('plotly_' + i, {y: [[resp[i]]]}, [0]);
-          }
-          else
-          {
-            data[i] = init_data(resp, i)
-          }
-          if (data[i].y.length > 1000()
-          {
-            data[i] = {}
-          }
-          
-          
-        }
-      })
-      .catch(err => {report_error(err)})
-    }, 1000);
-
-  </script>
+  <div id="plotlyDivt"></div>
+  <script>start()</script>
 </body>
