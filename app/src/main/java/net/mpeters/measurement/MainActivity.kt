@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
     private var mContext: Context? = null
     private lateinit var serverAddress: String
     private var currentMeasurement = JSONObject()
+    private val bluetoothStringBuilder = StringBuilder()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -65,6 +66,7 @@ class MainActivity : AppCompatActivity() {
             val formTextView: TextView = findViewById(R.id.serverAddress)
             when (view.getId()) {
                 R.id.radio_bluetooth -> {
+                    connectToBluetooth(forceReset=true)
                     formTextView.visibility = View.INVISIBLE
                     buttonServer.visibility = View.INVISIBLE
                     server.source = "bluetooth"
@@ -132,32 +134,106 @@ class MainActivity : AppCompatActivity() {
                 requestQueue.add(myReq)
             }
             "bluetooth" -> {
-                connect_to_bluetooth()
-                val bluetoothMessage: ByteArray = ByteArray(256)
-                bluetoothSocket.inputStream.read(bluetoothMessage, 0, 256)
-                currentMeasurement = JSONObject(bluetoothMessage.toString())
+                try
+                {
+                    val bytesAvailable = bluetoothSocket.inputStream.available()
+                    if (bytesAvailable == 0)
+                    {
+                        return currentMeasurement
+                    }
+
+                    val bluetoothMessage: ByteArray = ByteArray(bytesAvailable)
+                    bluetoothSocket.inputStream.read(bluetoothMessage, 0, bytesAvailable)
+                    bluetoothStringBuilder.append(bluetoothMessage.toString(Charsets.US_ASCII))
+
+                    if (bluetoothStringBuilder.indexOf("\n") == bluetoothStringBuilder.lastIndexOf("\n"))
+                    {
+                        return currentMeasurement
+                    }
+                    var bluetoothString = bluetoothStringBuilder.toString()
+                    bluetoothString = bluetoothString.substring(bluetoothString.indexOf("\n") + 1)
+                    bluetoothString = bluetoothString.substring(0, bluetoothString.indexOf("\n") + 1)
+
+                    bluetoothStringBuilder.clear()
+                    try {
+                        currentMeasurement = JSONObject(bluetoothString)
+                    }
+                    catch (e: JSONException) {
+                        return currentMeasurement
+                    }
+                }
+                catch (e: java.lang.Exception) {
+                    return currentMeasurement
+                }
+
+
             }
         }
         return currentMeasurement
     }
 
-    private fun connect_to_bluetooth() {
-        var force_reset: Boolean = false
-        if (bluetoothAdapter == null) {
-            bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
-            force_reset = true
+    private fun connectToBluetooth(forceReset: Boolean = false) {
+
+        var forceReset = forceReset
+        if (!::bluetoothAdapter.isInitialized || forceReset) {
+
+            try {
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+                forceReset = true
+
+            } catch (e: Exception){
+                val text = "Could not find Bluetooth device."
+                val duration = Toast.LENGTH_LONG
+
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+                return
+            }
 
         }
-        if (bluetoothDevice == null || force_reset) {
-            bluetoothDevice = bluetoothAdapter!!.getRemoteDevice("98:D3:51:FD:96:8E")
-            force_reset = true
+        if (!::bluetoothDevice.isInitialized || forceReset) {
+            try {
+                bluetoothDevice = bluetoothAdapter!!.getRemoteDevice("98:D3:51:FD:96:8E")
+                forceReset = true
+            } catch (e: Exception) {
+                val text = "Could not find remote Bluetooth device."
+                val duration = Toast.LENGTH_LONG
 
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+                return
+            }
         }
-        if (bluetoothSocket == null || force_reset) {
+
+        if (!::bluetoothSocket.isInitialized || forceReset) {
+            try {
+                bluetoothSocket.close()
+            } catch (e: Exception) {
+                // that's fine
+            }
+            try {
             bluetoothSocket =
-                    bluetoothDevice.createInsecureRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-80000-00805f9b34fb"))
-            bluetoothSocket.connect()
+                    bluetoothDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"))
+
+            } catch (e: Exception){
+                val text = e.message
+                val duration = Toast.LENGTH_SHORT
+
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+            }
+            try {
+                bluetoothSocket.connect()
+            } catch (e: Exception){
+                val text = "Failed to connect: " + e.message
+                val duration = Toast.LENGTH_SHORT
+
+                val toast = Toast.makeText(applicationContext, text, duration)
+                toast.show()
+            }
+
         }
+
     }
 
     private fun createMyReqSuccessListener(): Response.Listener<JSONObject> {
@@ -196,8 +272,9 @@ class MainActivity : AppCompatActivity() {
                 //TODO
             } else if (uri.startsWith("/api/measurement")) {
                 getValues(source)
-                response = newFixedLengthResponse(currentMeasurement.toString())
+                response = newFixedLengthResponse(currentMeasurement!!.toString())
                 response.mimeType = "application/json"
+
             }
             else {
                 response = newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_FOUND, null, null)
@@ -206,6 +283,9 @@ class MainActivity : AppCompatActivity() {
             response.addHeader("Access-Control-Allow-Origin", "*")
             return response
         }
+
     }
+
+
 }
 
