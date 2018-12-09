@@ -6,23 +6,27 @@ import android.bluetooth.BluetoothSocket
 import android.content.Context
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
-import android.webkit.WebView
-import android.widget.TextView
 import android.view.View
-import android.widget.RadioButton
-import fi.iki.elonen.NanoHTTPD
-import org.json.JSONObject
-import kotlin.random.Random
+import android.view.inputmethod.InputMethodManager
+import android.webkit.WebView
+import android.widget.*
 import com.android.volley.Request
 import com.android.volley.RequestQueue
 import com.android.volley.Response
-import com.android.volley.toolbox.Volley
 import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import fi.iki.elonen.NanoHTTPD
 import org.json.JSONException
-
+import org.json.JSONObject
+import java.text.SimpleDateFormat
 import java.util.*
-import android.content.res.AssetFileDescriptor
-import android.widget.Toast
+
+val mimeTypes = hashMapOf(
+    "html" to "text/html",
+    "css" to "text/css",
+    "js" to "application/javascript",
+    "ico" to "image/x-icon"
+)
 
 
 class MainActivity : AppCompatActivity() {
@@ -30,11 +34,13 @@ class MainActivity : AppCompatActivity() {
     private val server = WebServer()
     private lateinit var requestQueue: RequestQueue
     private lateinit var textView: TextView
-    private lateinit var textServerAddress: TextView
+    private lateinit var buttonServer: Button
     private lateinit var bluetoothAdapter: BluetoothAdapter
     private lateinit var bluetoothSocket: BluetoothSocket
     private lateinit var bluetoothDevice: BluetoothDevice
     private var mContext: Context? = null
+    private lateinit var serverAddress: String
+    private var currentMeasurement = JSONObject()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,10 +48,11 @@ class MainActivity : AppCompatActivity() {
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
         setContentView(R.layout.activity_main)
         requestQueue = Volley.newRequestQueue(this.applicationContext)
-        textView = findViewById(R.id.textView)
-        textServerAddress = findViewById(R.id.serverAddress)
-        val myWebView: WebView = findViewById(R.id.webView)
+        textView = findViewById(R.id.heading)
 
+        buttonServer = findViewById(R.id.serverButton)
+        serverAddress = findViewById<TextView>(R.id.serverAddress).text.toString()
+        val myWebView: WebView = findViewById(R.id.webView)
 
         val webSettings = myWebView.getSettings()
         webSettings.javaScriptEnabled = true
@@ -59,22 +66,41 @@ class MainActivity : AppCompatActivity() {
             when (view.getId()) {
                 R.id.radio_bluetooth -> {
                     formTextView.visibility = View.INVISIBLE
+                    buttonServer.visibility = View.INVISIBLE
                     server.source = "bluetooth"
                 }
 
                 R.id.radio_http -> {
                     formTextView.visibility = View.VISIBLE
+                    buttonServer.visibility = View.VISIBLE
                     server.source = "http"
-
                 }
 
                 R.id.radio_random -> {
                     formTextView.visibility = View.INVISIBLE
+                    buttonServer.visibility = View.INVISIBLE
                     server.source = "random"
                 }
-
             }
         }
+    }
+
+    fun onButtonDataSourceClicked(view: View) {
+        var row = findViewById<TableRow>(R.id.Settings)
+        if (row.visibility == View.VISIBLE) {
+            row.visibility = View.GONE
+            textView.text = getString(R.string.textSelectSource)
+        }
+        else {
+            row.visibility = View.VISIBLE
+            textView.text = getString(R.string.textClickSelectSource)
+        }
+    }
+
+    fun onButtonClicked(view: View) {
+        serverAddress = findViewById<TextView>(R.id.serverAddress).text.toString()
+        val imm = mContext!!.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
     override fun onDestroy() {
@@ -82,32 +108,37 @@ class MainActivity : AppCompatActivity() {
         server.stop()
     }
 
-    private var rootObject = JSONObject()
     private fun getValues(method: String): JSONObject {
 
-        if (method == "random") {
-            rootObject = JSONObject()
-            rootObject.put("a", (0 until 10).random())
-            rootObject.put("b", (0 until 10).random())
-            rootObject.put("c", (0 until 10).random())
-        } else if (method == "http") {
-            val myReq = JsonObjectRequest(
-                Request.Method.GET,
-                textServerAddress.text.toString(),
-                null,
-                createMyReqSuccessListener(),
-                createMyReqErrorListener()
-            )
-            requestQueue.add(myReq)
-        } else if (method == "bluetooth") {
-            connect_to_bluetooth()
-            var bluetoothMessage: ByteArray = ByteArray(256)
-            bluetoothSocket.inputStream.read(bluetoothMessage, 0, 256)
-            rootObject = JSONObject(bluetoothMessage.toString())
+        when (method) {
+            "random" -> {
+                val calendar = Calendar.getInstance().time
+                val format = SimpleDateFormat("h:mm:ss")
+                currentMeasurement = JSONObject()
+                currentMeasurement.put("Temperature", (10 until 40).random())
+                currentMeasurement.put("Humidity", (0 until 100).random())
+                currentMeasurement.put("Salinity", (100 until 600).random())
+                currentMeasurement.put("timestamp", format.format(calendar.time))
+                currentMeasurement.put("millis", format.format(calendar.time))
+            }
+            "http" -> {
+                val myReq = JsonObjectRequest(
+                    Request.Method.GET,
+                    serverAddress + "/api/measurement",
+                    null,
+                    createMyReqSuccessListener(),
+                    createMyReqErrorListener()
+                )
+                requestQueue.add(myReq)
+            }
+            "bluetooth" -> {
+                connect_to_bluetooth()
+                val bluetoothMessage: ByteArray = ByteArray(256)
+                bluetoothSocket.inputStream.read(bluetoothMessage, 0, 256)
+                currentMeasurement = JSONObject(bluetoothMessage.toString())
+            }
         }
-
-        return rootObject
-
+        return currentMeasurement
     }
 
     private fun connect_to_bluetooth() {
@@ -127,14 +158,12 @@ class MainActivity : AppCompatActivity() {
                     bluetoothDevice.createInsecureRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-80000-00805f9b34fb"))
             bluetoothSocket.connect()
         }
-
     }
 
     private fun createMyReqSuccessListener(): Response.Listener<JSONObject> {
         return Response.Listener { response ->
             try {
-                textView.text = response.toString()
-                rootObject = response
+                currentMeasurement = response
             } catch (e: JSONException) {
                 textView.text = "Parse error"
             }
@@ -143,57 +172,40 @@ class MainActivity : AppCompatActivity() {
 
 
     private fun createMyReqErrorListener(): Response.ErrorListener {
-        return Response.ErrorListener { error -> textView.text = error.message }
+        return Response.ErrorListener { error ->
+            textView.text = error.message
+        }
     }
 
-    private inner class WebServer : NanoHTTPD("localhost", 8080) {
+    private inner class WebServer : NanoHTTPD(null, 8080) {
 
         var source: String = "random"
         override fun serve(session: IHTTPSession): NanoHTTPD.Response {
             var uri = session.uri.toString()
-            //val toast = Toast.makeText(applicationContext, uri, Toast.LENGTH_LONG)
-            //toast.show()
-            textView.text = uri
-
+            lateinit var response: NanoHTTPD.Response
             if (uri == "" || uri == "/") {
                 uri = "/www/index.html"
             }
-            if ((uri.endsWith(".html") || uri.endsWith(".js") || uri.endsWith(".css") || uri.endsWith(".ico")) && uri.startsWith("/www/")) {
-                val fd = assets.openFd(uri.substring(1))
+            val suffix = uri.substring(uri.lastIndexOf(".") + 1)
 
-                var mbuffer = mContext!!.getAssets().open(uri.substring(1))
-                var mime: String
-                when (uri.takeLast(3)) {
-                    "tml" -> mime = "text/html"
-                    "css" -> mime = "text/css"
-                    ".js" -> mime = "application/javascript"
-                    "ico" -> mime = "image/x-icon"
-                    else -> {
-                        mime = ""
-                    }
-                }
-                textView.text = "mime: " + uri + mime
-                return newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mime, mbuffer, fd.getLength())
+            if (uri.startsWith("/www/") && mimeTypes.keys.contains(suffix)) {
+                val mbuffer = mContext!!.assets.open(uri.substring(1))
+                response =  newFixedLengthResponse(NanoHTTPD.Response.Status.OK, mimeTypes[suffix], mbuffer, mbuffer.available().toLong())
 
-
-            }
-            else if (uri.startsWith("/api/button/")) {
-                val toast = Toast.makeText(applicationContext, "button", Toast.LENGTH_LONG)
-
+            } else if (uri.startsWith("/api/button/")) {
+                //TODO
+            } else if (uri.startsWith("/api/measurement")) {
+                getValues(source)
+                response = newFixedLengthResponse(currentMeasurement.toString())
+                response.mimeType = "application/json"
             }
             else {
-                getValues(source)
-                val response = newFixedLengthResponse(rootObject.toString())
-                response.addHeader("Access-Control-Allow-Origin", "*")
-                return response
+                response = newFixedLengthResponse(NanoHTTPD.Response.Status.NOT_FOUND, null, null)
             }
 
-            return newFixedLengthResponse("meh")
-
+            response.addHeader("Access-Control-Allow-Origin", "*")
+            return response
         }
-
-
-
     }
 }
 

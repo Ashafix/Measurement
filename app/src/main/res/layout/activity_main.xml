@@ -3,56 +3,159 @@
                 xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 tools:context=".MainActivity" android:id="@+id/main">
+    <TableLayout
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:id="@+id/MainTable"
+    >
 
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/textView"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="-128dp"
-            android:layout_marginLeft="0dp"
-            android:layout_marginStart="0dp"
-            android:layout_marginRight="0dp"
-            android:layout_marginEnd="0dp" android:text="Select data source"/>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+            <Button
+                    android:text="@string/textSelectSource"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:id="@+id/heading"
+                    style="@android:style/Widget.DeviceDefault.Button.Borderless"
+                    android:onClick="onButtonDataSourceClicked"/>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/Settings">
+            <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
 
-    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
-                android:layout_height="wrap_content"
-                android:orientation="vertical" android:layout_alignParentStart="true"
-                android:layout_alignParentTop="true" android:layout_marginTop="19dp" android:layout_marginStart="0dp"
-                android:layout_width="wrap_content">
+                <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/layoutDataSource">
 
-        <RadioButton android:id="@+id/radio_http"
-                     android:text="@string/http"
-                     android:onClick="onRadioButtonClicked" android:checked="true" android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"/>
-        <RadioButton android:id="@+id/radio_bluetooth"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:text="@string/bluetooth"
-                     android:onClick="onRadioButtonClicked"/>
-        <RadioButton android:id="@+id/radio_random"
-                     android:layout_width="wrap_content"
-                     android:layout_height="wrap_content"
-                     android:text="@string/random"
-                     android:onClick="onRadioButtonClicked"/>
-    </RadioGroup>
+                    <RadioGroup
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:id="@+id/radioGroup" android:layout_width="wrap_content"
+                            android:paddingTop="8dp">
+
+                        <TextView
+                                android:text="Data source "
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content" android:id="@+id/textView2"/>
+                        <RadioButton android:id="@+id/radio_http"
+                                     android:text="@string/http"
+                                     android:onClick="onRadioButtonClicked" android:checked="true"
+                                     android:layout_width="wrap_content"
+                                     android:layout_height="wrap_content" android:textSize="12sp"/>
+                        <RadioButton android:id="@+id/radio_bluetooth"
+                                     android:layout_width="wrap_content"
+                                     android:layout_height="wrap_content" android:textSize="12sp"
+                                     android:text="@string/bluetooth"
+                                     android:onClick="onRadioButtonClicked"/>
+                        <RadioButton android:id="@+id/radio_random"
+                                     android:layout_width="wrap_content"
+                                     android:layout_height="wrap_content" android:textSize="12sp"
+                                     android:text="@string/random"
+                                     android:onClick="onRadioButtonClicked" android:checked="true"/>
+                    </RadioGroup>
+                    <EditText
+                            android:layout_height="47dp"
+                            android:inputType="textUri"
+                            android:text="@string/defaultServer"
+                            android:ems="10"
+                            android:id="@+id/serverAddress"
+                            android:visibility="invisible" android:hint="@string/hintHttpAddress"
+                            android:textSize="12sp"
+                            android:layout_width="213dp" android:selectAllOnFocus="true" android:singleLine="true"
+                            android:layout_toEndOf="@+id/radioGroup"
+                    />
+
+                    <Button
+                            android:text="@string/textOK"
+                            android:id="@+id/serverButton"
+                            style="@style/Widget.AppCompat.Button.Small"
+                            android:onClick="onButtonClicked" android:textSize="12sp" android:visibility="invisible"
+                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:gravity="center_vertical|center_horizontal"
+                            android:layout_toEndOf="@+id/serverAddress"
+                    />
+                </RelativeLayout>
+                <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@+id/layoutDataSource" android:id="@+id/radioGroupGraph"
+                        android:checkedButton="@+id/radioGraph" android:visibility="visible">
+                    <TextView
+                            android:text="Display values as"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1" android:paddingRight="10dp"/>
+                    <RadioButton
+                            android:text="Graph"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/radioGraph"
+                            android:layout_weight="1"
+                    />
+                    <RadioButton
+                            android:text="Text"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/radioText"
+                            android:layout_weight="1"/>
+                </RadioGroup>
 
 
-    <EditText
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:inputType="textUri"
-            android:text="@string/defaultServer"
-            android:ems="10"
-            android:layout_alignParentStart="true" android:layout_marginStart="169dp"
-            android:layout_alignParentTop="true" android:id="@+id/serverAddress" android:layout_marginTop="12dp"/>
-    <WebView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:layout_alignParentEnd="true"
-            android:layout_alignParentTop="true" android:layout_marginEnd="0dp" android:layout_marginTop="116dp"
-            android:visibility="visible" android:id="@+id/webView"/>
+                <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" android:id="@+id/relativeLayoutFormat"
+                        android:layout_below="@+id/layoutDataSource"
+                        android:layout_toRightOf="@+id/radioGroupGraph">
+                    <RadioGroup
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radioGroupFormat">
+                        <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:id="@+id/textDataFormat"
+                                android:layout_weight="1"
+                                android:text="Data format "/>
+                        <RadioButton
+                                android:text="JSON"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:id="@+id/radioButtonFormatJson"
+                                android:layout_weight="1" android:checked="true"/>
+                        <RadioButton
+                                android:text="Delimited"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content" android:id="@+id/radioButtonFormatDelimited"
+                                android:layout_weight="1"/>
+
+                    </RadioGroup>
+                    <EditText
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPersonName"
+                            android:text=";"
+                            android:ems="10"
+                            android:id="@+id/textDelimiter" android:layout_weight="1"
+                            android:layout_alignBottom="@+id/radioGroupFormat"
+                            android:layout_toRightOf="@+id/radioGroupFormat"/>
+                </RelativeLayout>
+            </RelativeLayout>
+        </TableRow>
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent"
+                  android:id="@+id/TableRowWebView">
+            <WebView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:visibility="visible" android:id="@+id/webView">
+
+            </WebView>
+        </TableRow>
+        <TableRow
+                android:layout_width="match_parent"
+                android:layout_height="match_parent" android:id="@+id/TableRowList" android:visibility="invisible">
+            <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" android:layout_alignParentStart="true"
+                    android:layout_marginStart="0dp"
+                    android:layout_alignParentBottom="true" android:layout_marginBottom="38dp"/>
+        </TableRow>
+    </TableLayout>
+
 
 </RelativeLayout>
