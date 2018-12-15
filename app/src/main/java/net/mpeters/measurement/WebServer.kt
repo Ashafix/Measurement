@@ -43,11 +43,7 @@ class WebServer (context: Context, dataProvider: DataProvider, port: Int = 8080)
             } catch (e: VolleyError) {
                 response = newFixedLengthResponse("something went wrong")
                 response.mimeType = mimeTypes.get("html")
-
             }
-
-
-
         } else {
             response = newFixedLengthResponse(Response.Status.NOT_FOUND, null, null)
         }

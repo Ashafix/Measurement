@@ -13,17 +13,12 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 
-
-
-
-
 class DataProvider(var requestQueue: RequestQueue,
                    var dataSource: String,
                    var dataFormat: String,
                    var serverAddress: String,
                    var delimiter: String,
-                   var terminator: String)
-{
+                   var terminator: String) {
 
     var currentMeasurement = JSONObject()
     private lateinit var bluetoothAdapter: BluetoothAdapter
@@ -47,30 +42,26 @@ class DataProvider(var requestQueue: RequestQueue,
             }
             "http" -> {
                 if (dataFormat == "json") {
-                    var myReq = JsonObjectRequest(
+                    val myReq = JsonObjectRequest(
                         Request.Method.GET,
                         "$serverAddress/api/measurement",
                         null,
                         createMyReqSuccessListenerJson(),
-                        createMyReqErrorListener()
-                    )
+                        createMyReqErrorListener())
                     requestQueue.add(myReq)
                 } else {
-                    var myReq = StringRequest(
+                    val myReq = StringRequest(
                         Request.Method.GET,
                         "$serverAddress/api/measurement",
                         createMyReqSuccessListenerCsv(),
-                        createMyReqErrorListener()
-                    )
+                        createMyReqErrorListener())
                     requestQueue.add(myReq)
                 }
             }
             "bluetooth" -> {
-                try
-                {
+                try {
                     val bytesAvailable = bluetoothSocket.inputStream.available()
-                    if (bytesAvailable == 0)
-                    {
+                    if (bytesAvailable == 0) {
                         return currentMeasurement
                     }
 
@@ -78,8 +69,7 @@ class DataProvider(var requestQueue: RequestQueue,
                     bluetoothSocket.inputStream.read(bluetoothMessage, 0, bytesAvailable)
                     bluetoothStringBuilder.append(bluetoothMessage.toString(Charsets.US_ASCII))
 
-                    if (bluetoothStringBuilder.indexOf(terminator) == bluetoothStringBuilder.lastIndexOf(terminator))
-                    {
+                    if (bluetoothStringBuilder.indexOf(terminator) == bluetoothStringBuilder.lastIndexOf(terminator)) {
                         return currentMeasurement
                     }
                     var bluetoothString = bluetoothStringBuilder.toString()
@@ -89,8 +79,7 @@ class DataProvider(var requestQueue: RequestQueue,
                     bluetoothStringBuilder.clear()
                     try {
                         currentMeasurement = JSONObject(bluetoothString)
-                    }
-                    catch (e: JSONException) {
+                    } catch (e: JSONException) {
                         return currentMeasurement
                     }
                 }
@@ -106,15 +95,12 @@ class DataProvider(var requestQueue: RequestQueue,
 
         var forceReset = forceReset
         if (!::bluetoothAdapter.isInitialized || forceReset) {
-
             try {
                 bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
                 forceReset = true
-
             } catch (e: Exception) {
                 throw DataProviderException("Could not find Bluetooth device.")
             }
-
         }
         if (!::bluetoothDevice.isInitialized || forceReset) {
             try {
@@ -135,14 +121,13 @@ class DataProvider(var requestQueue: RequestQueue,
                 bluetoothSocket =
                         bluetoothDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"))
 
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 throw DataProviderException(e.message.toString())
             }
             try {
                 bluetoothSocket.connect()
-            } catch (e: Exception){
+            } catch (e: Exception) {
                 throw DataProviderException("Failed to connect: $e.message")
-
             }
         }
     }
@@ -153,7 +138,6 @@ class DataProvider(var requestQueue: RequestQueue,
                 currentMeasurement = response
             } catch (e: JSONException) {
                 throw DataProviderException("Parse error")
-
             }
         }
     }
@@ -162,17 +146,14 @@ class DataProvider(var requestQueue: RequestQueue,
         return Response.Listener { response ->
             try {
                 currentMeasurement = JSONObject()
-
                 val values = response.split(delimiter)
                 var index = 0
-                for (v in values)
-                {
+                for (v in values) {
                     index++
                     currentMeasurement.put("Value $index", v)
                 }
             } catch (e: JSONException) {
                 throw DataProviderException("Parse error")
-
             }
         }
     }
