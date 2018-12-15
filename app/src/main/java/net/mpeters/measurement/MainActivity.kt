@@ -11,6 +11,9 @@ import android.widget.*
 import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import fi.iki.elonen.NanoHTTPD
+import android.view.View.OnFocusChangeListener
+
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -51,7 +54,17 @@ class MainActivity : AppCompatActivity() {
     fun onRadioButtonDataSourceClicked(view: View) {
         if (view is RadioButton) {
             val textServerAddress: TextView = findViewById(R.id.serverAddress)
+            textServerAddress.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    hideKeyboard(view)
+                }
+            }
             val textTerminator: TextView = findViewById(R.id.textTerminator)
+            textTerminator.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
+                if (!hasFocus) {
+                    hideKeyboard(view)
+                }
+            }
             when (view.getId()) {
                 R.id.radioBluetooth -> {
                     try {
