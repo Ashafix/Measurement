@@ -1,24 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                tools:context=".MainActivity" android:id="@+id/main">
+                tools:context=".MainActivity"
+                android:id="@+id/main">
     <TableLayout
-            android:layout_width="match_parent" android:layout_height="match_parent"
-            android:id="@+id/MainTable"
-    >
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/MainTable">
 
-        <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+        <TableRow android:layout_width="match_parent"
+                  android:layout_height="match_parent">
             <Button
                     android:text="@string/textSelectSource"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:id="@+id/heading"
                     style="@android:style/Widget.DeviceDefault.Button.Borderless"
-
-                    android:onClick="onRadioButtonSettingsClicked" android:textAlignment="center"/>
+                    android:onClick="onRadioButtonSettingsClicked"
+                    android:textAlignment="center"/>
         </TableRow>
-        <TableRow android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/Settings"
+        <TableRow android:layout_width="match_parent"
+                  android:layout_height="match_parent"
+                  android:id="@+id/Settings"
                   android:visibility="visible">
 
             <RelativeLayout
@@ -38,7 +43,8 @@
                     <RadioGroup
                             android:layout_height="wrap_content"
                             android:orientation="vertical"
-                            android:id="@+id/radioGroup" android:layout_width="wrap_content"
+                            android:id="@+id/radioGroup"
+                            android:layout_width="wrap_content"
                             android:layout_below="@+id/textView2">
 
                         <RadioButton android:id="@+id/radioRandom"
@@ -205,12 +211,14 @@
                                 android:layout_height="wrap_content"
                                 android:id="@+id/radioButtonFormatJson"
                                 android:layout_weight="1"
+                                android:onClick="onRadioButtonDataFormatClicked"
                                 android:checked="true"/>
                         <RadioButton
                                 android:text="@string/textDelimited"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:id="@+id/radioButtonFormatDelimited"
+                                android:onClick="onRadioButtonDataFormatClicked"
                                 android:layout_weight="1"/>
 
                     </RadioGroup>
@@ -223,9 +231,7 @@
                             android:id="@+id/textDelimiter"
                             android:layout_weight="1"
                             android:layout_alignBottom="@+id/radioGroupFormat"
-                            android:layout_toEndOf="@+id/radioGroupFormat"
-
-                            />
+                            android:layout_toEndOf="@+id/radioGroupFormat"/>
                     <Button
                             android:text="@string/textOK"
                             android:id="@+id/buttonDelimiter"
@@ -242,19 +248,16 @@
             </RelativeLayout>
         </TableRow>
 
-
-
         <WebView
                 android:layout_width="match_parent"
                 android:visibility="visible"
                 android:id="@+id/webView"
                 android:layout_height="fill_parent">
-
         </WebView>
         <TableLayout
-            android:layout_width="match_parent" android:layout_height="match_parent"
-            android:id="@+id/tableMeasurements"
-        >
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/tableMeasurements">
         </TableLayout>
         <ListView
                 android:layout_width="match_parent"
@@ -262,7 +265,4 @@
                 android:layout_marginStart="0dp"/>
 
     </TableLayout>
-
-
-
 </RelativeLayout>

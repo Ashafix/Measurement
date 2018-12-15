@@ -50,7 +50,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onRadioButtonDataSourceClicked(view: View) {
         if (view is RadioButton) {
-            val textServerAdress: TextView = findViewById(R.id.serverAddress)
+            val textServerAddress: TextView = findViewById(R.id.serverAddress)
             val textTerminator: TextView = findViewById(R.id.textTerminator)
             when (view.getId()) {
                 R.id.radioBluetooth -> {
@@ -60,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                         Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                     }
 
-                    textServerAdress.visibility = View.INVISIBLE
+                    textServerAddress.visibility = View.INVISIBLE
                     buttonServer.visibility = View.INVISIBLE
                     textTerminator.visibility = View.VISIBLE
                     buttonTerminator.visibility = View.VISIBLE
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.radioHttp -> {
-                    textServerAdress.visibility = View.VISIBLE
+                    textServerAddress.visibility = View.VISIBLE
                     buttonServer.visibility = View.VISIBLE
                     textTerminator.visibility = View.INVISIBLE
                     buttonTerminator.visibility = View.INVISIBLE
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
                 R.id.radioRandom -> {
-                    textServerAdress.visibility = View.INVISIBLE
+                    textServerAddress.visibility = View.INVISIBLE
                     buttonServer.visibility = View.INVISIBLE
                     textTerminator.visibility = View.INVISIBLE
                     buttonTerminator.visibility = View.INVISIBLE
@@ -87,6 +87,19 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun onRadioButtonDataFormatClicked(view: View) {
+        if (view is RadioButton) {
+            when (view.getId()) {
+                R.id.radioButtonFormatJson -> {
+                    dataProvider.dataFormat = "json"
+                }
+
+                R.id.radioButtonFormatDelimited -> {
+                    dataProvider.dataFormat = "csv"
+                }
+            }
+        }
+    }
     fun onRadioButtonSettingsClicked(view: View) {
         var row = findViewById<TableRow>(R.id.Settings)
         if (row.visibility == View.VISIBLE) {
