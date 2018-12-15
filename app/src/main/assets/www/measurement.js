@@ -20,9 +20,33 @@ function init_data(resp, key) {
     div = document.createElement('div');
   }
   div.id = 'plotly_' + i;
-  document.body.appendChild(div);
+  var plotlyGrid = document.getElementById('plotlyGrid');
+  var existingPlots = plotlyGrid.childNodes.length - 1;
+  var row = Math.floor(existingPlots / 2);
+  var col = existingPlots - 2 * row;
+  div.style.setProperty('grid-row-start', row + 1);
+  div.style.setProperty('grid-row-end', row + 2);
+  div.style.setProperty('grid-column-start', col + 1);
+  div.style.setProperty('grid-column-end', col + 2);
+  div.style.setProperty('height', '100%');
+  div.className = 'box';
+
+  plotlyGrid.appendChild(div);
   Plotly.newPlot(div, [data],
-                 {'title': key}, {displayModeBar: false});
+                 {title: key,
+                  paper_bgcolor: 'rgba(0,0,0,0)',
+                  plot_bgcolor: 'rgba(0,0,0,0)',
+                  margin: {l: 25,
+                           r: 0,
+                           b: 60,
+                           t: 25,
+                           pad: 0},
+                  xaxis: {showgrid: false,
+                          automargin: true},
+                  yaxis: {showgrid: false}},
+                 {displayModeBar: false,
+                  responsive: true});
+
   return data
 }
 
@@ -87,10 +111,17 @@ function start() {
 
         }
         else {
-          data[i] = init_data(resp, i)
+          data[i] = init_data(resp, i);
         }
         if (data[i].y.length > 1000) {
-          data[i] = {}
+          data[i].x = data[i].x.slice(900);
+          data[i].y = data[i].y.slice(900);
+
+          Plotly.restyle('plotly_' + i, {
+              x: [data[i].x],
+              y: [data[i].y]
+            });
+
         }
       }
     })

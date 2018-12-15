@@ -6,20 +6,30 @@
   <script src="file://android_asset/www/measurement.js"></script>
   <script src="http://localhost:8080/www/measurement.js"></script>
 
-  <link rel="stylesheet" href="file://android_asset/www/bootstrap.min.css">
-  <link rel="stylesheet" href="http://localhost:8080/www/bootstrap.min.css">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+  <link rel="stylesheet" type="text/css" href="file://android_asset/www/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost:8080/www/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
         integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
+  <link rel="stylesheet" type="text/css" href="file://android_asset/www/measurement.css">
+  <link rel="stylesheet" type="text/css" href="http://localhost:8080/www/measurement.css">
 </head>
 
 <body>
-  <div id="message">Initializing....</div>
-  <button type="button" class="btn btn-dark" id="button1" onclick="button(0)">Relay 1</button>
-  <button type="button" class="btn btn-dark" id="button2" onclick="button(1)">Relay 2</button>
-  <button type="button" class="btn btn-dark" id="button3" onclick="button(2)">Relay 3</button>
-  <button type="button" class="btn btn-dark" id="button4" onclick="button(3)">Relay 4</button>
+  <div>
+    <div  class='buttonRow'>
+      <div id="message">Initializing....</div>
+      <button type="button" class="btn btn-dark" id="button1" onclick="button(0)">Relay 1</button>
+      <button type="button" class="btn btn-dark" id="button2" onclick="button(1)">Relay 2</button>
+      <button type="button" class="btn btn-dark" id="button3" onclick="button(2)">Relay 3</button>
+      <button type="button" class="btn btn-dark" id="button4" onclick="button(3)">Relay 4</button>
+    </div>
 
-  <div id="plotlyDivt"></div>
-  <script>start()</script>
+
+    <div id="plotlyDiv" class="plotlyDiv">
+      <div id="plotlyGrid" class="plotlyGrid">
+      </div>
+    </div>
+    <script>start()</script>
+  </div>
 </body>

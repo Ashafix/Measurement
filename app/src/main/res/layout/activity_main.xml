@@ -15,9 +15,11 @@
                     android:layout_height="match_parent"
                     android:id="@+id/heading"
                     style="@android:style/Widget.DeviceDefault.Button.Borderless"
-                    android:onClick="onButtonDataSourceClicked"/>
+
+                    android:onClick="onRadioButtonSettingsClicked" android:textAlignment="center"/>
         </TableRow>
-        <TableRow android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/Settings">
+        <TableRow android:layout_width="match_parent" android:layout_height="match_parent" android:id="@+id/Settings"
+                  android:visibility="visible">
             <RelativeLayout
                     android:layout_width="match_parent"
                     android:layout_height="match_parent">
@@ -36,22 +38,24 @@
                         <TextView
                                 android:text="Data source "
                                 android:layout_width="match_parent"
+
                                 android:layout_height="wrap_content" android:id="@+id/textView2"/>
                         <RadioButton android:id="@+id/radio_http"
                                      android:text="@string/http"
-                                     android:onClick="onRadioButtonClicked" android:checked="true"
+                                     android:onClick="onRadioButtonDataSourceClicked"
+                                     android:checked="true"
                                      android:layout_width="wrap_content"
                                      android:layout_height="wrap_content" android:textSize="12sp"/>
                         <RadioButton android:id="@+id/radio_bluetooth"
                                      android:layout_width="wrap_content"
                                      android:layout_height="wrap_content" android:textSize="12sp"
                                      android:text="@string/bluetooth"
-                                     android:onClick="onRadioButtonClicked"/>
+                                     android:onClick="onRadioButtonDataSourceClicked"/>
                         <RadioButton android:id="@+id/radio_random"
                                      android:layout_width="wrap_content"
                                      android:layout_height="wrap_content" android:textSize="12sp"
                                      android:text="@string/random"
-                                     android:onClick="onRadioButtonClicked" android:checked="true"/>
+                                     android:onClick="onRadioButtonDataSourceClicked" android:checked="true"/>
                     </RadioGroup>
                     <EditText
                             android:layout_height="47dp"
@@ -69,8 +73,11 @@
                             android:text="@string/textOK"
                             android:id="@+id/serverButton"
                             style="@style/Widget.AppCompat.Button.Small"
-                            android:onClick="onButtonClicked" android:textSize="12sp" android:visibility="invisible"
-                            android:layout_width="wrap_content" android:layout_height="wrap_content"
+                            android:onClick="onButtonClicked"
+                            android:textSize="12sp"
+                            android:visibility="invisible"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
                             android:gravity="center_vertical|center_horizontal"
                             android:layout_toEndOf="@+id/serverAddress"
                     />
@@ -78,50 +85,61 @@
                 <RadioGroup
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_below="@+id/layoutDataSource" android:id="@+id/radioGroupGraph"
-                        android:checkedButton="@+id/radioGraph" android:visibility="visible">
+                        android:layout_below="@+id/layoutDataSource"
+                        android:id="@+id/radioGroupGraph"
+                        android:checkedButton="@+id/radioGraph"
+                        android:visibility="visible">
                     <TextView
-                            android:text="Display values as"
+                            android:text="@string/TextDisplayValues"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1" android:paddingRight="10dp"/>
+                            android:layout_weight="1" android:paddingEnd="10dp"/>
                     <RadioButton
                             android:text="Graph"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:id="@+id/radioGraph"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radioGraph"
                             android:layout_weight="1"
+                            android:onClick="onRadioButtonViewClicked"
                     />
                     <RadioButton
                             android:text="Text"
                             android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" android:id="@+id/radioText"
-                            android:layout_weight="1"/>
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radioText"
+                            android:layout_weight="1"
+                            android:onClick="onRadioButtonViewClicked"/>
                 </RadioGroup>
 
 
                 <RelativeLayout
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content" android:id="@+id/relativeLayoutFormat"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/relativeLayoutFormat"
                         android:layout_below="@+id/layoutDataSource"
-                        android:layout_toRightOf="@+id/radioGroupGraph">
+                        android:layout_toEndOf="@+id/radioGroupGraph">
                     <RadioGroup
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:id="@+id/radioGroupFormat">
                         <TextView
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:id="@+id/textDataFormat"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/textDataFormat"
                                 android:layout_weight="1"
                                 android:text="Data format "/>
                         <RadioButton
                                 android:text="JSON"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:id="@+id/radioButtonFormatJson"
-                                android:layout_weight="1" android:checked="true"/>
+                                android:layout_height="wrap_content"
+                                android:id="@+id/radioButtonFormatJson"
+                                android:layout_weight="1"
+                                android:checked="true"/>
                         <RadioButton
-                                android:text="Delimited"
+                                android:text="@string/textDelimited"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content" android:id="@+id/radioButtonFormatDelimited"
+                                android:layout_height="wrap_content"
+                                android:id="@+id/radioButtonFormatDelimited"
                                 android:layout_weight="1"/>
 
                     </RadioGroup>
@@ -129,33 +147,36 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:inputType="textPersonName"
-                            android:text=";"
+                            android:text="@string/defaultDelimiter"
                             android:ems="10"
                             android:id="@+id/textDelimiter" android:layout_weight="1"
                             android:layout_alignBottom="@+id/radioGroupFormat"
-                            android:layout_toRightOf="@+id/radioGroupFormat"/>
+                            android:layout_toEndOf="@+id/radioGroupFormat"/>
                 </RelativeLayout>
             </RelativeLayout>
         </TableRow>
-        <TableRow android:layout_width="match_parent" android:layout_height="match_parent"
-                  android:id="@+id/TableRowWebView">
-            <WebView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:visibility="visible" android:id="@+id/webView">
 
-            </WebView>
-        </TableRow>
-        <TableRow
+
+
+        <WebView
                 android:layout_width="match_parent"
-                android:layout_height="match_parent" android:id="@+id/TableRowList" android:visibility="invisible">
-            <ListView
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" android:layout_alignParentStart="true"
-                    android:layout_marginStart="0dp"
-                    android:layout_alignParentBottom="true" android:layout_marginBottom="38dp"/>
-        </TableRow>
+                android:visibility="visible"
+                android:id="@+id/webView"
+                android:layout_height="fill_parent">
+
+        </WebView>
+        <TableLayout
+            android:layout_width="match_parent" android:layout_height="match_parent"
+            android:id="@+id/tableMeasurements"
+        >
+        </TableLayout>
+        <ListView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="0dp"/>
+
     </TableLayout>
+
 
 
 </RelativeLayout>

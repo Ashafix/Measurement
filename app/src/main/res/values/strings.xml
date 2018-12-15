@@ -9,5 +9,8 @@
     <string name="defaultServer">http://192.168.0.6:8080</string>
     <string name="random">Random</string>
     <string name="hintHttpAddress">Please enter an address in the following format: http://192.168.0.6:8080</string>
+    <string name="TextDisplayValues">Display values as</string>
+    <string name="defaultDelimiter">;</string>
+    <string name="textDelimited">Delimited</string>
 
 </resources>

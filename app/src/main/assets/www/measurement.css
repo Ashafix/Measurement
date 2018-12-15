@@ -1,0 +1,19 @@
+body {
+  background-color: rgb(0, 0, 0);
+}
+
+.plotlyDiv {
+  height: 90%;
+  padding-top: 1em;
+}
+
+.plotlyGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-gap: 20px;
+  height: 100%;
+}
+
+.buttonRow {
+  height: 10%;
+}
