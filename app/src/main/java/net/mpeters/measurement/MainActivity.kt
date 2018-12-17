@@ -45,16 +45,10 @@ class MainActivity : AppCompatActivity() {
             getString(R.string.defaultDelimiter), getString(R.string.defaultTerminator))
         server = WebServer(mContext as Context, dataProvider)
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
-        val webView: WebView = findViewById(R.id.webView)
-        webView.settings.javaScriptEnabled = true
-        webView.loadUrl("file:///android_asset/www/index.html")
+
+        clearResults()
         measurementUpdater = MeasurementsUpdater(findViewById(android.R.id.content),this)
         measurementUpdater.run()
-    }
-
-    fun onButtonBluetoothSettingsClicked(view: View)
-    {
-        findViewById<RadioButton>(R.id.radioBluetooth).performClick()
     }
 
     fun onRadioButtonDataSourceClicked(view: View) {
@@ -114,12 +108,13 @@ class MainActivity : AppCompatActivity() {
                         dataProvider.bluetoothAddress = deviceAddress
                         try {
                             dataProvider.connectToBluetooth(forceReset = true)
-                            findViewById<RadioButton>(R.id.radioBluetooth).text = findViewById<RadioButton>(R.id.radioBluetooth).text.split(sep)[0] + sep + deviceAddress
+                            findViewById<RadioButton>(R.id.radioBluetooth).text = findViewById<RadioButton>(R.id.radioBluetooth).text.split(sep)[0] + sep + deviceName
                         } catch (e: DataProviderException) {
                             Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                         }
                         listview.visibility = View.GONE
                     }
+                    clearResults()
                 }
 
                 R.id.radioHttp -> {
@@ -129,6 +124,7 @@ class MainActivity : AppCompatActivity() {
                     buttonTerminator.visibility = View.INVISIBLE
                     dataProvider.dataSource = "http"
                     tableRowBluetooth.visibility = View.GONE
+                    clearResults()
                 }
 
                 R.id.radioRandom -> {
@@ -138,6 +134,7 @@ class MainActivity : AppCompatActivity() {
                     buttonTerminator.visibility = View.INVISIBLE
                     dataProvider.dataSource = "random"
                     tableRowBluetooth.visibility = View.GONE
+                    clearResults()
                 }
             }
         }
@@ -164,6 +161,8 @@ class MainActivity : AppCompatActivity() {
         var table = findViewById<TableLayout>(R.id.MainTable)
         var numberRows = table.childCount
         val showSettings = table.getChildAt(1).visibility == View.GONE
+
+        // hide all rows except for the first one (settings) and last one (results)
         for (i in 1 until numberRows - 1)
         {
             table.getChildAt(i).visibility = if (showSettings) View.VISIBLE else View.GONE
@@ -208,6 +207,15 @@ class MainActivity : AppCompatActivity() {
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 
+    private fun clearResults() {
+        var webView: WebView = findViewById(R.id.webView)
+        webView.settings.javaScriptEnabled = true
+        webView.loadUrl("about:blank")
+        webView.loadUrl("file:///android_asset/www/index.html")
+        val table = findViewById<TableLayout>(R.id.tableMeasurements)
+        table.removeAllViews()
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         server.stop()
@@ -228,6 +236,7 @@ class MainActivity : AppCompatActivity() {
         {
             dataProvider.getValues()
             val table = view.findViewById<TableLayout>(R.id.tableMeasurements)
+
             for (k in dataProvider.currentMeasurement.keys()) {
                 if (k == "millis" || k == "timestamp") {
                     continue
@@ -251,6 +260,24 @@ class MainActivity : AppCompatActivity() {
                     textValue.text = dataProvider.currentMeasurement.getString(k)
                 }
             }
+
+            // remove table rows which are not in current measurement
+            var allRowsOk = false
+            while (!allRowsOk)
+            {
+                for (i in 0 until table.childCount) {
+                    val row = table.getChildAt(i) as TableRow
+                    val colHeader = row.getChildAt(0) as TextView
+                    val measurementName = colHeader.text.take(colHeader.text.length - 2) as String
+                    if (!dataProvider.currentMeasurement.has(measurementName))
+                    {
+                        table.removeView(row)
+                        break
+                    }
+                }
+                allRowsOk = true
+            }
+
             run()
         }
     }
