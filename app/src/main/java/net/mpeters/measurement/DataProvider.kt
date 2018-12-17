@@ -147,7 +147,7 @@ class DataProvider(private var requestQueue: RequestQueue,
             try {
                 bluetoothSocket.connect()
             } catch (e: Exception) {
-                throw DataProviderException("Failed to connect: $e.message")
+                throw DataProviderException("Failed to connect: " + e.message)
             }
         }
     }
@@ -179,7 +179,7 @@ class DataProvider(private var requestQueue: RequestQueue,
     }
 
     private fun createMyReqErrorListener(): Response.ErrorListener {
-        return Response.ErrorListener {  }
+        return Response.ErrorListener {  } //TODO
     }
 }
 

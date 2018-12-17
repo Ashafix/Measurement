@@ -13,7 +13,7 @@
     <string name="textGraph">Graph</string>
     <string name="textText">Text</string>
     <string name="action_settings">Settings</string>
-    <string name="defaultServer">http://192.168.0.6:8080</string>
+    <string name="textDefaultServer">http://192.168.0.6:8080</string>
     <string name="defaultDelimiter">;</string>
     <string name="defaultTerminator">\n</string>
     <string name="hintHttpAddress">Please enter an address in the following format: http://192.168.0.6:8080</string>

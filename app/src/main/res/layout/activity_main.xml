@@ -1,300 +1,280 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+
+<TableLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/MainTable"
+        android:visibility="visible">
+    <TableRow android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/tableRowHeading" android:visibility="visible">
+        <Button
+                android:text="@string/textSelectSource"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context=".MainActivity"
-                android:id="@+id/main"
-                android:visibility="visible">
-    <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:id="@+id/MainTable"
-            android:visibility="visible">
-        <TableRow android:layout_width="match_parent"
-                  android:layout_height="match_parent"
-                  android:id="@+id/tableRowHeading" android:visibility="visible">
-            <Button
-                    android:text="@string/textSelectSource"
+                android:layout_height="wrap_content"
+                android:id="@+id/heading"
+                style="@android:style/Widget.DeviceDefault.Button.Borderless"
+                android:onClick="onRadioButtonSettingsClicked"
+                android:textAlignment="center"/>
+    </TableRow>
+    <TableRow android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/tableRowSettings"
+              android:visibility="visible">
+
+
+        <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/layoutDataSource">
+            <TextView
+                    android:text="@string/textDataSource"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:id="@+id/heading"
-                    style="@android:style/Widget.DeviceDefault.Button.Borderless"
-                    android:onClick="onRadioButtonSettingsClicked"
-                    android:textAlignment="center"/>
-        </TableRow>
-        <TableRow android:layout_width="match_parent"
-                  android:layout_height="wrap_content"
-                  android:id="@+id/tableRowSettings"
-                  android:visibility="visible">
-
-
-            <RelativeLayout
-                    android:layout_width="wrap_content"
+                    android:id="@+id/textDataSource"/>
+            <RadioGroup
                     android:layout_height="wrap_content"
-                    android:id="@+id/layoutDataSource">
-                <TextView
-                        android:text="@string/textDataSource"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/textDataSource"/>
-                <RadioGroup
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:id="@+id/radioGroup"
-                        android:layout_width="wrap_content"
-                        android:layout_below="@+id/textDataSource">
+                    android:orientation="vertical"
+                    android:id="@+id/radioGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_below="@+id/textDataSource">
+                <RadioButton android:id="@+id/radioBluetooth"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:textSize="12sp"
+                             android:text="@string/textSourceBluetooth"
+                             android:onClick="onRadioButtonDataSourceClicked"
+                             android:checked="false"/>
+                <RadioButton android:id="@+id/radioHttp"
+                             android:text="@string/textSourceHttp"
+                             android:onClick="onRadioButtonDataSourceClicked"
+                             android:checked="false"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:textSize="12sp"/>
+                <RadioButton android:id="@+id/radioRandom"
+                             android:layout_width="wrap_content"
+                             android:layout_height="wrap_content"
+                             android:textSize="12sp"
+                             android:text="@string/textSourceRandom"
+                             android:onClick="onRadioButtonDataSourceClicked"
+                             android:checked="true"/>
 
-                    <RadioButton android:id="@+id/radioRandom"
+            </RadioGroup>
+
+            <RadioGroup
+                    android:layout_height="wrap_content"
+                    android:id="@+id/radioGroupDummy1"
+                    android:layout_width="wrap_content"
+                    android:layout_below="@+id/textDataSource">
+                <RelativeLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/layoutColumn2">
+                    <RadioButton android:id="@+id/radioDummy1"
                                  android:layout_width="wrap_content"
                                  android:layout_height="wrap_content"
                                  android:textSize="12sp"
                                  android:text="@string/textSourceRandom"
-                                 android:onClick="onRadioButtonDataSourceClicked"
-                                 android:checked="true"
-                                 android:layout_below="@+id/radioBluetooth"/>
-                    <RadioButton android:id="@+id/radioHttp"
+                                 android:visibility="invisible"/>
+                    <RadioButton android:id="@+id/radioDummy2"
                                  android:text="@string/textSourceHttp"
-                                 android:onClick="onRadioButtonDataSourceClicked"
-                                 android:checked="false"
                                  android:layout_width="wrap_content"
                                  android:layout_height="wrap_content"
                                  android:textSize="12sp"
-                                 android:layout_below="@+id/textDataSource"/>
-                    <RadioButton android:id="@+id/radioBluetooth"
+                                 android:visibility="invisible"
+                                 android:layout_below="@+id/radioDummy1"/>
+                    <RadioButton android:id="@+id/radioDummy3"
                                  android:layout_width="wrap_content"
                                  android:layout_height="wrap_content"
                                  android:textSize="12sp"
                                  android:text="@string/textSourceBluetooth"
-                                 android:onClick="onRadioButtonDataSourceClicked"
-                                 android:layout_below="@+id/radioHttp"/>
-                </RadioGroup>
-
-                <RadioGroup
-                        android:layout_height="wrap_content"
-                        android:id="@+id/radioGroupDummy1"
-                        android:layout_width="wrap_content"
-                        android:layout_below="@+id/textDataSource">
-                    <RelativeLayout
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/layoutColumn2">
-                        <RadioButton android:id="@+id/radioDummy1"
-                                     android:layout_width="wrap_content"
-                                     android:layout_height="wrap_content"
-                                     android:textSize="12sp"
-                                     android:text="@string/textSourceRandom"
-                                     android:visibility="invisible"/>
-                        <RadioButton android:id="@+id/radioDummy2"
-                                     android:text="@string/textSourceHttp"
-                                     android:layout_width="wrap_content"
-                                     android:layout_height="wrap_content"
-                                     android:textSize="12sp"
-                                     android:visibility="invisible"
-                                     android:layout_below="@+id/radioDummy1"/>
-                        <RadioButton android:id="@+id/radioDummy3"
-                                     android:layout_width="wrap_content"
-                                     android:layout_height="wrap_content"
-                                     android:textSize="12sp"
-                                     android:text="@string/textSourceBluetooth"
-                                     android:visibility="invisible"
-                                     android:layout_below="@+id/radioDummy2"/>
-                        <EditText
-                                android:layout_height="47dp"
-                                android:inputType="textUri"
-                                android:text="@string/defaultServer"
-                                android:ems="10"
-                                android:id="@+id/serverAddress"
-                                android:visibility="gone"
-                                android:hint="@string/hintHttpAddress"
-                                android:textSize="12sp"
-                                android:layout_width="213dp"
-                                android:selectAllOnFocus="true"
-                                android:singleLine="true"
-                                android:layout_toRightOf="@+id/radioDummy2"
-                                android:layout_alignBottom="@+id/radioDummy2"
-                                android:textAlignment="viewStart"/>
-
-                        <Button
-                                android:text="@string/textOK"
-                                android:id="@+id/buttonServer"
-                                style="@style/Widget.AppCompat.Button.Small"
-                                android:onClick="onButtonServerClicked"
-                                android:textSize="12sp"
-                                android:visibility="gone"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:gravity="center_vertical|center_horizontal"
-                                android:layout_toEndOf="@+id/serverAddress"
-                                android:layout_alignBottom="@+id/radioDummy2"/>
-
-                    </RelativeLayout>
-                </RadioGroup>
-            </RelativeLayout>
-
-        </TableRow>
-        <TableRow android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:id="@+id/tableRowBluetooth"
-                  android:visibility="gone">
-            <RelativeLayout
-                    android:id="@+id/layoutBluetooth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content">
-                <Button
-                        android:text="@string/textShowBluetoothSettings"
-                        android:id="@+id/buttonBluetoothSettings"
-                        style="@style/Widget.AppCompat.Button.Small"
-                        android:onClick="onButtonBluetoothSettingsClicked"
-                        android:textSize="12sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:layout_toEndOf="@+id/textTerminator"
-                        android:layout_alignBottom="@+id/textTerminator"/>
-
-                <TextView
-                        android:text="@string/textTerminator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id  ="@+id/textHintTerminator"/>
-                <EditText
-                        android:layout_height="wrap_content"
-                        android:text="@string/defaultTerminator"
-                        android:ems="10"
-                        android:id="@+id/textTerminator"
-                        android:textSize="12sp"
-                        android:layout_width="213dp"
-                        android:selectAllOnFocus="true"
-                        android:singleLine="true"
-                        android:layout_alignBottom="@+id/textHintTerminator"
-                        android:layout_toEndOf="@+id/textHintTerminator"
-                        android:inputType="text"
-                        android:hint="@string/hintTerminator"/>
-                <Button
-                        android:text="@string/textOK"
-                        android:id="@+id/buttonTerminator"
-                        style="@style/Widget.AppCompat.Button.Small"
-                        android:onClick="onButtonBluetoothClicked"
-                        android:textSize="12sp"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:gravity="center_vertical|center_horizontal"
-                        android:layout_toEndOf="@+id/textTerminator"
-                        android:layout_alignBottom="@+id/textTerminator"/>
-                <ListView android:id="@+id/listViewBluetoothDevices"
-                          android:layout_width="wrap_content"
-                          android:layout_height="wrap_content">
-
-                </ListView>
-            </RelativeLayout>
-
-        </TableRow>
-        <TableRow android:layout_width="wrap_content"
-                  android:layout_height="wrap_content"
-                  android:id="@+id/tableRowDisplay">
-            <RelativeLayout>
-
-
-                <RadioGroup
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-
-                        android:id="@+id/radioGroupGraph"
-                        android:checkedButton="@+id/radioGraph"
-                        android:visibility="visible">
-                    <TextView
-                            android:text="@string/TextDisplayValues"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:paddingEnd="10dp"/>
-                    <RadioButton
-                            android:text="@string/textGraph"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/radioGraph"
-                            android:layout_weight="1"
-                            android:onClick="onRadioButtonViewClicked"/>
-                    <RadioButton
-                            android:text="@string/textText"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/radioText"
-                            android:layout_weight="1"
-                            android:onClick="onRadioButtonViewClicked"/>
-                </RadioGroup>
-
-
-                <RelativeLayout
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:id="@+id/relativeLayoutFormat"
-
-                        android:layout_toEndOf="@+id/radioGroupGraph">
-
-                    <RadioGroup
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:id="@+id/radioGroupFormat">
-                        <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/textDataFormat"
-                                android:layout_weight="1"
-                                android:text="@string/textDataFormat"/>
-                        <RadioButton
-                                android:text="@string/textJson"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/radioButtonFormatJson"
-                                android:layout_weight="1"
-                                android:onClick="onRadioButtonDataFormatClicked"
-                                android:checked="true"/>
-                        <RadioButton
-                                android:text="@string/textDelimited"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:id="@+id/radioButtonFormatDelimited"
-                                android:onClick="onRadioButtonDataFormatClicked"
-                                android:layout_weight="1"/>
-
-                    </RadioGroup>
+                                 android:visibility="invisible"
+                                 android:layout_below="@+id/radioDummy2"/>
                     <EditText
-                            android:layout_width="106dp"
                             android:layout_height="wrap_content"
-                            android:inputType="textPersonName"
-                            android:text="@string/defaultDelimiter"
+                            android:inputType="textUri"
+                            android:text="@string/textDefaultServer"
                             android:ems="10"
-                            android:id="@+id/textDelimiter"
-                            android:layout_weight="1"
-                            android:layout_alignBottom="@+id/radioGroupFormat"
-                            android:layout_toEndOf="@+id/radioGroupFormat"
-                            android:visibility="gone"/>
+                            android:id="@+id/editTextServerAddress"
+                            android:visibility="gone"
+
+                            android:textSize="12sp"
+                            android:layout_width="213dp"
+                            android:selectAllOnFocus="true"
+                            android:singleLine="true"
+                            android:layout_toEndOf="@+id/radioDummy2"
+                            android:layout_alignBottom="@+id/radioDummy2"
+                            android:textAlignment="viewStart"
+                            android:autofillHints=""/>
                     <Button
                             android:text="@string/textOK"
-                            android:id="@+id/buttonDelimiter"
+                            android:id="@+id/buttonServer"
                             style="@style/Widget.AppCompat.Button.Small"
-                            android:onClick="onButtonDelimiterClicked"
+                            android:onClick="onButtonServerClicked"
                             android:textSize="12sp"
                             android:visibility="gone"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignBottom="@+id/textDelimiter"
-                            android:layout_toEndOf="@+id/textDelimiter"/>
+                            android:gravity="center_vertical|center_horizontal"
+                            android:layout_toEndOf="@+id/editTextServerAddress"
+                            android:layout_alignBottom="@+id/radioDummy2"/>
                 </RelativeLayout>
-            </RelativeLayout>
-        </TableRow>
-        <TableRow>
-            <WebView
-                    android:visibility="visible"
-                    android:id="@+id/webView">
-            </WebView>
-            <TableLayout
+            </RadioGroup>
+        </RelativeLayout>
+
+    </TableRow>
+    <TableRow android:layout_width="wrap_content"
+              android:layout_height="wrap_content"
+              android:id="@+id/tableRowBluetooth">
+        <RelativeLayout
+                android:id="@+id/layoutBluetooth"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+            <TextView
+                    android:id="@+id/textHintTerminator"
+                    android:text="@string/textTerminator"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            <EditText
+                    android:layout_height="wrap_content"
+                    android:text="@string/defaultTerminator"
+                    android:ems="10"
+                    android:id="@+id/textTerminator"
+                    android:textSize="12sp"
+                    android:layout_width="213dp"
+                    android:selectAllOnFocus="true"
+                    android:singleLine="true"
+                    android:layout_alignBottom="@+id/textHintTerminator"
+                    android:layout_toEndOf="@+id/textHintTerminator"
+                    android:inputType="text"
+                    android:autofillHints=""/>
+            <Button
+                    android:text="@string/textOK"
+                    android:id="@+id/buttonTerminator"
+                    style="@style/Widget.AppCompat.Button.Small"
+                    android:onClick="onButtonBluetoothClicked"
+                    android:textSize="12sp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:id="@+id/tableMeasurements">
-            </TableLayout>
-        </TableRow>
-    </TableLayout>
-</RelativeLayout>
+                    android:gravity="center_vertical|center_horizontal"
+                    android:layout_toEndOf="@+id/textTerminator"
+                    android:layout_alignBottom="@+id/textTerminator"/>
+            <ListView android:id="@+id/listViewBluetoothDevices"
+                      android:layout_width="wrap_content"
+                      android:layout_height="wrap_content"
+                      android:layout_below="@+id/textHintTerminator">
+
+            </ListView>
+        </RelativeLayout>
+
+    </TableRow>
+    <TableRow android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:id="@+id/tableRowDisplay">
+        <RelativeLayout>
+
+
+            <RadioGroup
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+
+                    android:id="@+id/radioGroupGraph"
+                    android:checkedButton="@+id/radioGraph"
+                    android:visibility="visible">
+                <TextView
+                        android:text="@string/TextDisplayValues"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:paddingEnd="10dp"/>
+                <RadioButton
+                        android:text="@string/textGraph"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/radioGraph"
+                        android:layout_weight="1"
+                        android:onClick="onRadioButtonViewClicked"/>
+                <RadioButton
+                        android:text="@string/textText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/radioText"
+                        android:layout_weight="1"
+                        android:onClick="onRadioButtonViewClicked"/>
+            </RadioGroup>
+
+
+            <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/relativeLayoutFormat"
+
+                    android:layout_toEndOf="@+id/radioGroupGraph">
+
+                <RadioGroup
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/radioGroupFormat">
+                    <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/textDataFormat"
+                            android:layout_weight="1"
+                            android:text="@string/textDataFormat"/>
+                    <RadioButton
+                            android:text="@string/textJson"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radioButtonFormatJson"
+                            android:layout_weight="1"
+                            android:onClick="onRadioButtonDataFormatClicked"
+                            android:checked="true"/>
+                    <RadioButton
+                            android:text="@string/textDelimited"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/radioButtonFormatDelimited"
+                            android:onClick="onRadioButtonDataFormatClicked"
+                            android:layout_weight="1"/>
+
+                </RadioGroup>
+                <EditText
+                        android:layout_width="106dp"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"
+                        android:text="@string/defaultDelimiter"
+                        android:ems="10"
+                        android:id="@+id/textDelimiter"
+                        android:layout_alignBottom="@+id/radioGroupFormat"
+                        android:layout_toEndOf="@+id/radioGroupFormat"
+                        android:visibility="gone" android:autofillHints=""/>
+                <Button
+                        android:text="@string/textOK"
+                        android:id="@+id/buttonDelimiter"
+                        style="@style/Widget.AppCompat.Button.Small"
+                        android:onClick="onButtonDelimiterClicked"
+                        android:textSize="12sp"
+                        android:visibility="gone"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_alignBottom="@+id/textDelimiter"
+                        android:layout_toEndOf="@+id/textDelimiter"/>
+            </RelativeLayout>
+        </RelativeLayout>
+    </TableRow>
+    <TableRow android:layout_height="fill_parent"
+        android:layout_width="match_parent">
+        <WebView
+
+                android:visibility="visible"
+                android:id="@+id/webView">
+        </WebView>
+        <TableLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/tableMeasurements">
+        </TableLayout>
+    </TableRow>
+</TableLayout>

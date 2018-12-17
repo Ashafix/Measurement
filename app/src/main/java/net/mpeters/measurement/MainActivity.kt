@@ -17,7 +17,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    private var mContext: Context? = null
+    private lateinit var mContext: Context
     private lateinit var server: WebServer
     private lateinit var requestQueue: RequestQueue
     private lateinit var textView: TextView
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
         dataProvider = DataProvider(requestQueue,
             "random",
             "json",
-            findViewById<TextView>(R.id.serverAddress).text.toString(),
+            findViewById<TextView>(R.id.editTextServerAddress).text.toString(),
             getString(R.string.defaultDelimiter), getString(R.string.defaultTerminator))
         server = WebServer(mContext as Context, dataProvider)
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
@@ -59,7 +59,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onRadioButtonDataSourceClicked(view: View) {
         if (view is RadioButton) {
-            val textServerAddress: TextView = findViewById(R.id.serverAddress)
+            val textServerAddress: TextView = findViewById(R.id.editTextServerAddress)
             textServerAddress.onFocusChangeListener = OnFocusChangeListener { _, hasFocus ->
                 if (!hasFocus) {
                     hideKeyboard(view)
@@ -74,18 +74,16 @@ class MainActivity : AppCompatActivity() {
             when (view.getId()) {
 
                 R.id.radioBluetooth -> {
-
                     textServerAddress.visibility = View.INVISIBLE
                     buttonServer.visibility = View.INVISIBLE
                     textTerminator.visibility = View.VISIBLE
                     buttonTerminator.visibility = View.VISIBLE
                     tableRowBluetooth.visibility = View.VISIBLE
-
                     dataProvider.dataSource = "bluetooth"
 
+                    val sep = ": "
                     val bluetoothDevices: SortedMap<String, String>
                     try {
-                        //dataProvider.connectToBluetooth(forceReset = true)
                         bluetoothDevices = dataProvider.getBluetoothDevices()
                     } catch (e: DataProviderException) {
                         Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
@@ -94,7 +92,7 @@ class MainActivity : AppCompatActivity() {
                     var devices = ArrayList<String>()
                     for (device in bluetoothDevices)
                     {
-                        var name = device.key + ": " + device.value
+                        var name = device.key + sep + device.value
                         devices.add(name)
 
                     }
@@ -103,16 +101,20 @@ class MainActivity : AppCompatActivity() {
                         android.R.layout.simple_list_item_1,
                         devices
                     )
+
                     val listview = findViewById<ListView>(R.id.listViewBluetoothDevices)
+                    listview.visibility = View.VISIBLE
                     listview.adapter = adapter
-                    listview.setOnItemClickListener { parent, view, position, id ->
-                        var cells = devices[position].split(": ")
-                        var deviceName =  cells.take(cells.size - 1).joinToString(separator = ": ")
+                    listview.setOnItemClickListener { _, _, position, _ ->
+
+                        var cells = devices[position].split(sep)
+                        var deviceName =  cells.take(cells.size - 1).joinToString(separator = sep)
                         var deviceAddress =  cells.last()
                         Toast.makeText(applicationContext, "Connecting to: $deviceName", Toast.LENGTH_SHORT).show()
                         dataProvider.bluetoothAddress = deviceAddress
                         try {
                             dataProvider.connectToBluetooth(forceReset = true)
+                            findViewById<RadioButton>(R.id.radioBluetooth).text = findViewById<RadioButton>(R.id.radioBluetooth).text.split(sep)[0] + sep + deviceAddress
                         } catch (e: DataProviderException) {
                             Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                         }
@@ -159,7 +161,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
     fun onRadioButtonSettingsClicked(view: View) {
-
         var table = findViewById<TableLayout>(R.id.MainTable)
         var numberRows = table.childCount
         val showSettings = table.getChildAt(1).visibility == View.GONE
@@ -188,7 +189,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onButtonServerClicked(view: View) {
-        dataProvider.serverAddress = findViewById<TextView>(R.id.serverAddress).text.toString()
+        dataProvider.serverAddress = findViewById<TextView>(R.id.editTextServerAddress).text.toString()
         hideKeyboard(view)
     }
 
@@ -215,7 +216,7 @@ class MainActivity : AppCompatActivity() {
     inner class MeasurementsUpdater(view: View, val context: Context): Runnable {
 
         private val handler = Handler()
-        var active = true
+        var active = true // not needed at the moment but could be handy later
 
         override fun run() {
             if (active) {
