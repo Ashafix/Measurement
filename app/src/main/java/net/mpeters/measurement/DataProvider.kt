@@ -12,8 +12,10 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.HashMap
 
-class DataProvider(var requestQueue: RequestQueue,
+
+class DataProvider(private var requestQueue: RequestQueue,
                    var dataSource: String,
                    var dataFormat: String,
                    var serverAddress: String,
@@ -25,6 +27,7 @@ class DataProvider(var requestQueue: RequestQueue,
     private lateinit var bluetoothSocket: BluetoothSocket
     private lateinit var bluetoothDevice: BluetoothDevice
     private val bluetoothStringBuilder = StringBuilder()
+    var bluetoothAddress = ""
 
     fun getValues(): JSONObject {
 
@@ -91,6 +94,23 @@ class DataProvider(var requestQueue: RequestQueue,
         return currentMeasurement
     }
 
+    fun getBluetoothDevices(): SortedMap<String, String> {
+        if (!::bluetoothAdapter.isInitialized) {
+            try {
+                bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
+            } catch (e: Exception) {
+                throw DataProviderException("Could not find Bluetooth device.")
+            }
+        }
+
+        var bluetoothDevices = HashMap<String, String>()
+        for (bt in bluetoothAdapter.bondedDevices)
+        {
+            bluetoothDevices[bt.name] = bt.address
+        }
+        return bluetoothDevices.toSortedMap()
+    }
+
     fun connectToBluetooth(forceReset: Boolean = false) {
 
         var forceReset = forceReset
@@ -104,7 +124,7 @@ class DataProvider(var requestQueue: RequestQueue,
         }
         if (!::bluetoothDevice.isInitialized || forceReset) {
             try {
-                bluetoothDevice = bluetoothAdapter!!.getRemoteDevice("98:D3:51:FD:96:8E")
+                bluetoothDevice = bluetoothAdapter!!.getRemoteDevice(bluetoothAddress)
                 forceReset = true
             } catch (e: Exception) {
                 throw DataProviderException("Could not find remote Bluetooth device.")

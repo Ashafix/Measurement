@@ -12,8 +12,8 @@ import com.android.volley.RequestQueue
 import com.android.volley.toolbox.Volley
 import fi.iki.elonen.NanoHTTPD
 import android.view.View.OnFocusChangeListener
-
-
+import android.widget.ArrayAdapter
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonTerminator: Button
     private lateinit var measurementUpdater: MeasurementsUpdater
     private lateinit var dataProvider: DataProvider
+    private lateinit var tableRowBluetooth: TableRow
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         textView = findViewById(R.id.heading)
         buttonServer = findViewById(R.id.buttonServer)
         buttonTerminator = findViewById(R.id.buttonTerminator)
-
+        tableRowBluetooth = findViewById(R.id.tableRowBluetooth)
 
         dataProvider = DataProvider(requestQueue,
             "random",
@@ -49,6 +50,11 @@ class MainActivity : AppCompatActivity() {
         webView.loadUrl("file:///android_asset/www/index.html")
         measurementUpdater = MeasurementsUpdater(findViewById(android.R.id.content),this)
         measurementUpdater.run()
+    }
+
+    fun onButtonBluetoothSettingsClicked(view: View)
+    {
+        findViewById<RadioButton>(R.id.radioBluetooth).performClick()
     }
 
     fun onRadioButtonDataSourceClicked(view: View) {
@@ -66,19 +72,52 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             when (view.getId()) {
+
                 R.id.radioBluetooth -> {
-                    try {
-                        dataProvider.connectToBluetooth(forceReset = true)
-                    } catch (e: DataProviderException) {
-                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
-                    }
 
                     textServerAddress.visibility = View.INVISIBLE
                     buttonServer.visibility = View.INVISIBLE
                     textTerminator.visibility = View.VISIBLE
                     buttonTerminator.visibility = View.VISIBLE
+                    tableRowBluetooth.visibility = View.VISIBLE
 
                     dataProvider.dataSource = "bluetooth"
+
+                    val bluetoothDevices: SortedMap<String, String>
+                    try {
+                        //dataProvider.connectToBluetooth(forceReset = true)
+                        bluetoothDevices = dataProvider.getBluetoothDevices()
+                    } catch (e: DataProviderException) {
+                        Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                        return
+                    }
+                    var devices = ArrayList<String>()
+                    for (device in bluetoothDevices)
+                    {
+                        var name = device.key + ": " + device.value
+                        devices.add(name)
+
+                    }
+                    var adapter = ArrayAdapter<String>(
+                        this,
+                        android.R.layout.simple_list_item_1,
+                        devices
+                    )
+                    val listview = findViewById<ListView>(R.id.listViewBluetoothDevices)
+                    listview.adapter = adapter
+                    listview.setOnItemClickListener { parent, view, position, id ->
+                        var cells = devices[position].split(": ")
+                        var deviceName =  cells.take(cells.size - 1).joinToString(separator = ": ")
+                        var deviceAddress =  cells.last()
+                        Toast.makeText(applicationContext, "Connecting to: $deviceName", Toast.LENGTH_SHORT).show()
+                        dataProvider.bluetoothAddress = deviceAddress
+                        try {
+                            dataProvider.connectToBluetooth(forceReset = true)
+                        } catch (e: DataProviderException) {
+                            Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
+                        }
+                        listview.visibility = View.GONE
+                    }
                 }
 
                 R.id.radioHttp -> {
@@ -87,6 +126,7 @@ class MainActivity : AppCompatActivity() {
                     textTerminator.visibility = View.INVISIBLE
                     buttonTerminator.visibility = View.INVISIBLE
                     dataProvider.dataSource = "http"
+                    tableRowBluetooth.visibility = View.GONE
                 }
 
                 R.id.radioRandom -> {
@@ -95,6 +135,7 @@ class MainActivity : AppCompatActivity() {
                     textTerminator.visibility = View.INVISIBLE
                     buttonTerminator.visibility = View.INVISIBLE
                     dataProvider.dataSource = "random"
+                    tableRowBluetooth.visibility = View.GONE
                 }
             }
         }
@@ -102,6 +143,7 @@ class MainActivity : AppCompatActivity() {
 
     fun onRadioButtonDataFormatClicked(view: View) {
         if (view is RadioButton) {
+            var visible = View.GONE
             when (view.getId()) {
                 R.id.radioButtonFormatJson -> {
                     dataProvider.dataFormat = "json"
@@ -109,19 +151,25 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.radioButtonFormatDelimited -> {
                     dataProvider.dataFormat = "csv"
+                    visible = View.VISIBLE
                 }
             }
+            findViewById<TextView>(R.id.textDelimiter).visibility = visible
+            findViewById<Button>(R.id.buttonDelimiter).visibility = visible
         }
     }
     fun onRadioButtonSettingsClicked(view: View) {
-        var row = findViewById<TableRow>(R.id.Settings)
-        if (row.visibility == View.VISIBLE) {
-            row.visibility = View.GONE
-            textView.text = getString(R.string.textClickSelectSource)
-        } else {
-            row.visibility = View.VISIBLE
-            textView.text = getString(R.string.textSelectSource)
+
+        var table = findViewById<TableLayout>(R.id.MainTable)
+        var numberRows = table.childCount
+        val showSettings = table.getChildAt(1).visibility == View.GONE
+        for (i in 1 until numberRows - 1)
+        {
+            table.getChildAt(i).visibility = if (showSettings) View.VISIBLE else View.GONE
         }
+
+        //change app heading
+        textView.text = if (showSettings) getString(R.string.textSelectSource) else getString(R.string.textClickSelectSource)
     }
 
     fun onRadioButtonViewClicked(view: View) {

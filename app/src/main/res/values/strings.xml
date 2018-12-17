@@ -7,13 +7,19 @@
     <string name="textSourceHttp">HTTP server</string>
     <string name="textSourceBluetooth">Bluetooth</string>
     <string name="textDataSource">Data source</string>
+    <string name="textDataFormat">Data format</string>
+    <string name="textTerminator">Terminator</string>
+    <string name="textJson">JSON</string>
+    <string name="textGraph">Graph</string>
+    <string name="textText">Text</string>
     <string name="action_settings">Settings</string>
     <string name="defaultServer">http://192.168.0.6:8080</string>
     <string name="defaultDelimiter">;</string>
     <string name="defaultTerminator">\n</string>
     <string name="hintHttpAddress">Please enter an address in the following format: http://192.168.0.6:8080</string>
+    <string name="hintTerminator">Please enter a character or string which terminates the Bluetooth message</string>
     <string name="TextDisplayValues">Display values as</string>
-
+    <string name="textShowBluetoothSettings">Show Bluetooth settings</string>
     <string name="textDelimited">Delimited</string>
 
     <string name="errorNoBluetoothDevice">Could not find Bluetooth device.</string>
