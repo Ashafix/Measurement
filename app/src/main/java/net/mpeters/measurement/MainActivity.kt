@@ -20,12 +20,13 @@ class MainActivity : AppCompatActivity() {
     private lateinit var mContext: Context
     private lateinit var server: WebServer
     private lateinit var requestQueue: RequestQueue
-    private lateinit var textView: TextView
+    private lateinit var textHeading: TextView
     private lateinit var buttonServer: Button
-    private lateinit var buttonTerminator: Button
     private lateinit var measurementUpdater: MeasurementsUpdater
     private lateinit var dataHandler: DataHandler
     private lateinit var tableRowBluetooth: TableRow
+
+    private val sep = ": "
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,17 +34,14 @@ class MainActivity : AppCompatActivity() {
         requestQueue = Volley.newRequestQueue(this)
         setContentView(R.layout.activity_main)
 
-        textView = findViewById(R.id.heading)
-        buttonServer = findViewById(R.id.buttonServer)
-        buttonTerminator = findViewById(R.id.buttonTerminator)
-        tableRowBluetooth = findViewById(R.id.tableRowBluetooth)
+        findViews()
 
         dataHandler = DataHandler(requestQueue,
             "random",
             "json",
             findViewById<TextView>(R.id.editTextServerAddress).text.toString(),
             getString(R.string.defaultDelimiter), getString(R.string.defaultTerminator))
-        server = WebServer(mContext as Context, dataHandler)
+        server = WebServer(mContext, dataHandler)
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
 
         clearResults()
@@ -51,6 +49,12 @@ class MainActivity : AppCompatActivity() {
         measurementUpdater.run()
     }
 
+    fun findViews()
+    {
+        textHeading = findViewById(R.id.heading)
+        buttonServer = findViewById(R.id.buttonServer)
+        tableRowBluetooth = findViewById(R.id.tableRowBluetooth)
+    }
     fun onRadioButtonDataSourceClicked(view: View) {
         if (view is RadioButton) {
             val textServerAddress: TextView = findViewById(R.id.editTextServerAddress)
@@ -71,11 +75,10 @@ class MainActivity : AppCompatActivity() {
                     textServerAddress.visibility = View.INVISIBLE
                     buttonServer.visibility = View.INVISIBLE
                     textTerminator.visibility = View.VISIBLE
-                    buttonTerminator.visibility = View.VISIBLE
+
                     tableRowBluetooth.visibility = View.VISIBLE
                     dataHandler.dataSource = "bluetooth"
 
-                    val sep = ": "
                     val bluetoothDevices: SortedMap<String, String>
                     try {
                         bluetoothDevices = dataHandler.getBluetoothDevices()
@@ -121,7 +124,6 @@ class MainActivity : AppCompatActivity() {
                     textServerAddress.visibility = View.VISIBLE
                     buttonServer.visibility = View.VISIBLE
                     textTerminator.visibility = View.INVISIBLE
-                    buttonTerminator.visibility = View.INVISIBLE
                     dataHandler.dataSource = "http"
                     tableRowBluetooth.visibility = View.GONE
                     clearResults()
@@ -131,7 +133,6 @@ class MainActivity : AppCompatActivity() {
                     textServerAddress.visibility = View.INVISIBLE
                     buttonServer.visibility = View.INVISIBLE
                     textTerminator.visibility = View.INVISIBLE
-                    buttonTerminator.visibility = View.INVISIBLE
                     dataHandler.dataSource = "random"
                     tableRowBluetooth.visibility = View.GONE
                     clearResults()
@@ -170,7 +171,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         //change app heading
-        textView.text = if (showSettings) getString(R.string.textSelectSource) else getString(R.string.textClickSelectSource)
+        textHeading.text = if (showSettings) getString(R.string.textSelectSource) else getString(R.string.textClickSelectSource)
     }
 
     fun onRadioButtonViewClicked(view: View) {
@@ -238,12 +239,23 @@ class MainActivity : AppCompatActivity() {
             dataHandler.getValues()
             val table = view.findViewById<TableLayout>(R.id.tableMeasurements)
 
-            for (k in dataHandler.currentMeasurement.keys()) {
-                if (k == "millis" || k == "timestamp") {
+            var keys = dataHandler.currentMeasurement.keys().asSequence().toMutableList()
+            keys.sort()
+            val indexTimestamp = keys.indexOf("timestamp")
+            if (indexTimestamp > -1)
+            {
+
+                var timestamp = keys[indexTimestamp]
+                keys.remove("timestamp")
+                keys.add(0, timestamp)
+            }
+
+            for (k in keys) {
+                if (k == "millis") {
                     continue
                 }
 
-                val headerText = "$k: "
+                val headerText = "$k$sep"
 
                 if (table.findViewWithTag<TextView>(headerText) == null) {
                     val row = TableRow(context)
