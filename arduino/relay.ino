@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial BTserial(10, 11); // RX | TX
+SoftwareSerial BTserial(10, 11); // TX | RX
 
 //4 channel relay
 #define relay1 4
@@ -22,14 +22,14 @@ SoftwareSerial BTserial(10, 11); // RX | TX
 //length of the buffer storing commands
 #define cmdLength 12
 
+//terminator used to encapsulate bluetooth messages
+
+#define terminator "\n"
 //every how many milliseconds the measurements are updated
 #define updatePeriod 1000
 
-
 boolean relayStatus[] = {false, false, false, false};
 unsigned long time;
-
-//CircularBuffer<char,cmdLength> cmdBuffer; 
 
 void setRelays()
 {
@@ -57,7 +57,8 @@ void executeInput()
     
   int index = 0;
   bool finished = false;
-  while (index < cmdLength) {
+  while (index < cmdLength && !finished) {
+    delay(10);
     if ((index == 0 || bt == true) && BTserial.available()) {
       character = BTserial.read();
       bt = true;
@@ -81,20 +82,16 @@ void executeInput()
       finished = true;
     }
     cmd[index] = character;
-    //cmdBuffer.push(character);
     index++;
   }
   String cmdStr = String(cmd);
-  /*if (cmdBuffer.size() > 0)
+  if (cmdStr.length() > 0)
   {
-    //Serial.println(cmdBuffer);
+  Serial.println(cmdStr);
+  Serial.println(cmdStr.length());
+  Serial.println("###########");
+    
   }
-  for (int i = 0; i < cmdBuffer.size(); i++)
-  {
-    Serial.print(cmdBuffer[i]);
-  }
-  //Serial.println(cmdBuffer.size());
-  */
   if (relay && cmdStr.substring(0, 8) == "button: ")
   {
     int index = cmdStr.substring(8, 9).toInt();
@@ -114,7 +111,7 @@ long measureDistance()
   digitalWrite(trigger, HIGH);
   delay(10);
   digitalWrite(trigger, LOW);
-  long t = pulseIn(echo, HIGH) / 2; // Echo-Zeit messen
+  long t = pulseIn(echo, HIGH) / 2;
   interrupts();
   long dist = t * 0.33356;
   if (dist > 0 && dist < 200)
@@ -122,8 +119,6 @@ long measureDistance()
     return dist;
   }
   return 0;
-
-  
 }
 
 String getMeasurements()
@@ -131,13 +126,12 @@ String getMeasurements()
   String output = "\"millis\": " + String(millis());
   if (sensorDistance)
   {
-    output += ",\n\"distance\": " + String(measureDistance());
+    output += ", \"distance\": " + String(measureDistance());
   }
   if (sensorTds)
   {
-    output += ",\n\"tds\": " + String(measureTds());
+    output += ", \"tds\": " + String(measureTds());
   }
-  //Serial.println(output);
   return output;
     
 }
@@ -170,12 +164,14 @@ void setup() {
 
 void loop() {
   executeInput();
-  delay(1000);
   if (millis() - time > updatePeriod)
   {
     time = millis();
-    BTserial.print("|^~\\{");
+    BTserial.print(terminator)
+    BTserial.print("{");
     BTserial.print(getMeasurements());
-    BTserial.print("}|^~\\");    
+    BTserial.print("}");
+    BTserial.print(terminator)
+    BTserial.flush();
   }
 }
