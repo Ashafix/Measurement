@@ -11,11 +11,11 @@ val mimeTypes = hashMapOf(
     "ico" to "image/x-icon"
 )
 
-class WebServer (context: Context, dataProvider: DataProvider, port: Int = 8080) : NanoHTTPD(null, port) {
+class WebServer (context: Context, dataHandler: DataHandler, port: Int = 8080) : NanoHTTPD(null, port) {
 
 
     private val context = context
-    private val dataProvider = dataProvider
+    private val dataHandler = dataHandler
 
     override fun serve(session: IHTTPSession): NanoHTTPD.Response {
         var uri = session.uri.toString()
@@ -35,10 +35,10 @@ class WebServer (context: Context, dataProvider: DataProvider, port: Int = 8080)
             )
 
         } else if (uri.startsWith("/api/button/")) {
-            //TODO
+            dataHandler.sendValues(uri)
         } else if (uri.startsWith("/api/measurement")) {
             try {
-                response = newFixedLengthResponse(dataProvider.getValues()!!.toString())
+                response = newFixedLengthResponse(dataHandler.getValues()!!.toString())
                 response.mimeType = "application/json"
             } catch (e: VolleyError) {
                 response = newFixedLengthResponse("something went wrong")

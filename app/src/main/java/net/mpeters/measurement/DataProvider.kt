@@ -15,7 +15,7 @@ import java.util.*
 import kotlin.collections.HashMap
 
 
-class DataProvider(private var requestQueue: RequestQueue,
+class DataHandler(private var requestQueue: RequestQueue,
                    var dataSource: String,
                    var dataFormat: String,
                    var serverAddress: String,
@@ -94,12 +94,38 @@ class DataProvider(private var requestQueue: RequestQueue,
         return currentMeasurement
     }
 
+    fun sendValues(uri: String) {
+        var uri = uri
+
+        when (dataSource) {
+            "random" -> {
+
+            }
+
+            "http" -> {
+                val myReq = StringRequest(
+                    Request.Method.GET,
+                    "$serverAddress$uri",
+                    null,
+                    createMyReqErrorListener())
+                requestQueue.add(myReq)
+            }
+
+            "bluetooth" -> {
+                if (uri.startsWith("/api/button/")) {
+                    uri = uri.substring("/api/button/".length)
+                }
+                bluetoothSocket.outputStream.write(uri.toByteArray(Charsets.US_ASCII))
+            }
+        }
+    }
+
     fun getBluetoothDevices(): SortedMap<String, String> {
         if (!::bluetoothAdapter.isInitialized) {
             try {
                 bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
             } catch (e: Exception) {
-                throw DataProviderException("Could not find Bluetooth device.")
+                throw DataHandlerException("Could not find Bluetooth device.")
             }
         }
 
@@ -119,7 +145,7 @@ class DataProvider(private var requestQueue: RequestQueue,
                 bluetoothAdapter = BluetoothAdapter.getDefaultAdapter()
                 forceReset = true
             } catch (e: Exception) {
-                throw DataProviderException("Could not find Bluetooth device.")
+                throw DataHandlerException("Could not find Bluetooth device.")
             }
         }
         if (!::bluetoothDevice.isInitialized || forceReset) {
@@ -127,7 +153,7 @@ class DataProvider(private var requestQueue: RequestQueue,
                 bluetoothDevice = bluetoothAdapter!!.getRemoteDevice(bluetoothAddress)
                 forceReset = true
             } catch (e: Exception) {
-                throw DataProviderException("Could not find remote Bluetooth device.")
+                throw DataHandlerException("Could not find remote Bluetooth device.")
             }
         }
 
@@ -142,12 +168,12 @@ class DataProvider(private var requestQueue: RequestQueue,
                         bluetoothDevice.createRfcommSocketToServiceRecord(UUID.fromString("00001101-0000-1000-8000-00805f9b34fb"))
 
             } catch (e: Exception) {
-                throw DataProviderException(e.message.toString())
+                throw DataHandlerException(e.message.toString())
             }
             try {
                 bluetoothSocket.connect()
             } catch (e: Exception) {
-                throw DataProviderException("Failed to connect: " + e.message)
+                throw DataHandlerException("Failed to connect: " + e.message)
             }
         }
     }
@@ -157,7 +183,7 @@ class DataProvider(private var requestQueue: RequestQueue,
             try {
                 currentMeasurement = response
             } catch (e: JSONException) {
-                throw DataProviderException("Parse error")
+                throw DataHandlerException("Parse error")
             }
         }
     }
@@ -173,7 +199,7 @@ class DataProvider(private var requestQueue: RequestQueue,
                     currentMeasurement.put("Value $index", v)
                 }
             } catch (e: JSONException) {
-                throw DataProviderException("Parse error")
+                throw DataHandlerException("Parse error")
             }
         }
     }
@@ -183,4 +209,4 @@ class DataProvider(private var requestQueue: RequestQueue,
     }
 }
 
-class DataProviderException(message:String): Exception(message)
+class DataHandlerException(message:String): Exception(message)

@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonServer: Button
     private lateinit var buttonTerminator: Button
     private lateinit var measurementUpdater: MeasurementsUpdater
-    private lateinit var dataProvider: DataProvider
+    private lateinit var dataHandler: DataHandler
     private lateinit var tableRowBluetooth: TableRow
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,12 +38,12 @@ class MainActivity : AppCompatActivity() {
         buttonTerminator = findViewById(R.id.buttonTerminator)
         tableRowBluetooth = findViewById(R.id.tableRowBluetooth)
 
-        dataProvider = DataProvider(requestQueue,
+        dataHandler = DataHandler(requestQueue,
             "random",
             "json",
             findViewById<TextView>(R.id.editTextServerAddress).text.toString(),
             getString(R.string.defaultDelimiter), getString(R.string.defaultTerminator))
-        server = WebServer(mContext as Context, dataProvider)
+        server = WebServer(mContext as Context, dataHandler)
         server.start(NanoHTTPD.SOCKET_READ_TIMEOUT, false)
 
         clearResults()
@@ -73,13 +73,13 @@ class MainActivity : AppCompatActivity() {
                     textTerminator.visibility = View.VISIBLE
                     buttonTerminator.visibility = View.VISIBLE
                     tableRowBluetooth.visibility = View.VISIBLE
-                    dataProvider.dataSource = "bluetooth"
+                    dataHandler.dataSource = "bluetooth"
 
                     val sep = ": "
                     val bluetoothDevices: SortedMap<String, String>
                     try {
-                        bluetoothDevices = dataProvider.getBluetoothDevices()
-                    } catch (e: DataProviderException) {
+                        bluetoothDevices = dataHandler.getBluetoothDevices()
+                    } catch (e: DataHandlerException) {
                         Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                         return
                     }
@@ -105,11 +105,11 @@ class MainActivity : AppCompatActivity() {
                         var deviceName =  cells.take(cells.size - 1).joinToString(separator = sep)
                         var deviceAddress =  cells.last()
                         Toast.makeText(applicationContext, "Connecting to: $deviceName", Toast.LENGTH_SHORT).show()
-                        dataProvider.bluetoothAddress = deviceAddress
+                        dataHandler.bluetoothAddress = deviceAddress
                         try {
-                            dataProvider.connectToBluetooth(forceReset = true)
+                            dataHandler.connectToBluetooth(forceReset = true)
                             findViewById<RadioButton>(R.id.radioBluetooth).text = findViewById<RadioButton>(R.id.radioBluetooth).text.split(sep)[0] + sep + deviceName
-                        } catch (e: DataProviderException) {
+                        } catch (e: DataHandlerException) {
                             Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
                         }
                         listview.visibility = View.GONE
@@ -122,7 +122,7 @@ class MainActivity : AppCompatActivity() {
                     buttonServer.visibility = View.VISIBLE
                     textTerminator.visibility = View.INVISIBLE
                     buttonTerminator.visibility = View.INVISIBLE
-                    dataProvider.dataSource = "http"
+                    dataHandler.dataSource = "http"
                     tableRowBluetooth.visibility = View.GONE
                     clearResults()
                 }
@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
                     buttonServer.visibility = View.INVISIBLE
                     textTerminator.visibility = View.INVISIBLE
                     buttonTerminator.visibility = View.INVISIBLE
-                    dataProvider.dataSource = "random"
+                    dataHandler.dataSource = "random"
                     tableRowBluetooth.visibility = View.GONE
                     clearResults()
                 }
@@ -145,11 +145,11 @@ class MainActivity : AppCompatActivity() {
             var visible = View.GONE
             when (view.getId()) {
                 R.id.radioButtonFormatJson -> {
-                    dataProvider.dataFormat = "json"
+                    dataHandler.dataFormat = "json"
                 }
 
                 R.id.radioButtonFormatDelimited -> {
-                    dataProvider.dataFormat = "csv"
+                    dataHandler.dataFormat = "csv"
                     visible = View.VISIBLE
                 }
             }
@@ -157,6 +157,7 @@ class MainActivity : AppCompatActivity() {
             findViewById<Button>(R.id.buttonDelimiter).visibility = visible
         }
     }
+
     fun onRadioButtonSettingsClicked(view: View) {
         var table = findViewById<TableLayout>(R.id.MainTable)
         var numberRows = table.childCount
@@ -188,17 +189,17 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun onButtonServerClicked(view: View) {
-        dataProvider.serverAddress = findViewById<TextView>(R.id.editTextServerAddress).text.toString()
+        dataHandler.serverAddress = findViewById<TextView>(R.id.editTextServerAddress).text.toString()
         hideKeyboard(view)
     }
 
     fun onButtonBluetoothClicked(view: View) {
-        dataProvider.terminator = findViewById<TextView>(R.id.textTerminator).text.toString()
+        dataHandler.terminator = findViewById<TextView>(R.id.textTerminator).text.toString()
         hideKeyboard(view)
     }
 
     fun onButtonDelimiterClicked(view: View) {
-        dataProvider.delimiter = findViewById<TextView>(R.id.textDelimiter).text.toString()
+        dataHandler.delimiter = findViewById<TextView>(R.id.textDelimiter).text.toString()
         hideKeyboard(view)
     }
 
@@ -234,10 +235,10 @@ class MainActivity : AppCompatActivity() {
 
         private var updateResultTable = Runnable()
         {
-            dataProvider.getValues()
+            dataHandler.getValues()
             val table = view.findViewById<TableLayout>(R.id.tableMeasurements)
 
-            for (k in dataProvider.currentMeasurement.keys()) {
+            for (k in dataHandler.currentMeasurement.keys()) {
                 if (k == "millis" || k == "timestamp") {
                     continue
                 }
@@ -250,14 +251,14 @@ class MainActivity : AppCompatActivity() {
                     val colValue = TextView(context)
                     colHeader.text = headerText
                     colHeader.tag = headerText
-                    colValue.text = dataProvider.currentMeasurement.getString(k)
+                    colValue.text = dataHandler.currentMeasurement.getString(k)
                     row.addView(colHeader)
                     row.addView(colValue)
                     table.addView(row)
                 } else {
                     val row = table.findViewWithTag<TextView>(headerText).parent as TableRow
                     val textValue = row.getChildAt(1) as TextView
-                    textValue.text = dataProvider.currentMeasurement.getString(k)
+                    textValue.text = dataHandler.currentMeasurement.getString(k)
                 }
             }
 
@@ -269,7 +270,7 @@ class MainActivity : AppCompatActivity() {
                     val row = table.getChildAt(i) as TableRow
                     val colHeader = row.getChildAt(0) as TextView
                     val measurementName = colHeader.text.take(colHeader.text.length - 2) as String
-                    if (!dataProvider.currentMeasurement.has(measurementName))
+                    if (!dataHandler.currentMeasurement.has(measurementName))
                     {
                         table.removeView(row)
                         break
